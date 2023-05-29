@@ -1,8 +1,9 @@
-import 'package:bus_ticketing/app/root_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/dependency_injection.dart';
+import 'app/root_app.dart';
 import 'data/hive/hive_utils.dart';
 
 void main() async {
@@ -20,7 +21,7 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  runApp(const MainApp());
+  runApp(const ProviderScope(child: MainApp()));
 }
 
 class MainApp extends StatelessWidget {

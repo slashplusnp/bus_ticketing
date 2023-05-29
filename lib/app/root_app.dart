@@ -39,6 +39,12 @@ class RootApp extends StatelessWidget {
           ),
           initialRoute: Routes.splash.name,
           onGenerateRoute: Routes.getRoute,
+          builder: (context, child) {
+            return ScrollConfiguration(
+              behavior: const ScrollBehaviorModified(),
+              child: child ?? Container(),
+            );
+          },
         );
       },
     );
