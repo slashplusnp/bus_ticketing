@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 import '../resources/routes_manager.dart';
+import '../resources/theme_managar.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -32,11 +33,7 @@ class RootApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           navigatorKey: navigatorKey,
-          theme: ThemeData(
-            useMaterial3: true,
-            brightness: Brightness.light,
-            colorSchemeSeed: Colors.green,
-          ),
+          theme: ThemeManager.getAppTheme(),
           initialRoute: Routes.splash.name,
           onGenerateRoute: Routes.getRoute,
           builder: (context, child) {

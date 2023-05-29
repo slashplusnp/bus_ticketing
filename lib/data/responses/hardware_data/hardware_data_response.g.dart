@@ -89,7 +89,7 @@ Map<String, dynamic> _$HardwareDataToJson(HardwareData instance) =>
     };
 
 HardwareDataResponse _$HardwareDataResponseFromJson(
-        Map<String, dynamic> json,) =>
+        Map<String, dynamic> json) =>
     HardwareDataResponse(
       error: json['error'] as int,
       errorMessage: json['errorMessage'] as String,
@@ -99,7 +99,7 @@ HardwareDataResponse _$HardwareDataResponseFromJson(
     );
 
 Map<String, dynamic> _$HardwareDataResponseToJson(
-        HardwareDataResponse instance,) =>
+        HardwareDataResponse instance) =>
     <String, dynamic>{
       'error': instance.error,
       'errorMessage': instance.errorMessage,

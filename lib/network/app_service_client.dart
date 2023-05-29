@@ -3,6 +3,7 @@ import 'package:retrofit/http.dart';
 
 import '../app/constants.dart';
 import '../data/responses/hardware_data/hardware_data_response.dart';
+import '../data/responses/ticket_category/ticket_category.dart';
 
 part 'app_service_client.g.dart';
 
@@ -14,4 +15,7 @@ abstract class AppServiceClient {
   Future<HardwareDataResponse> login(
     @Field('identifier') String identifier,
   );
+
+  @GET(UrlConstants.categoryUrl)
+  Future<TicketCategoryResponse> getTicketCategories();
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../data/repository/repository.dart';
 import '../data/requests/login_request/login_request.dart';
 import '../data/responses/hardware_data/hardware_data_response.dart';
+import '../data/responses/ticket_category/ticket_category.dart';
 import '../providers/app_state/app_state.dart';
 import '../resources/string_manager.dart';
 import '../utils/app_state_utils.dart';
@@ -11,6 +12,7 @@ import '../utils/app_state_utils.dart';
 abstract class ApiService {
   Future<HardwareData?> login(BuildContext context, {required LoginRequest loginRequest});
   Future<bool> logout(BuildContext context);
+  Future<List<TicketCategory>> getTicketCategories();
 }
 
 class ApiServiceImpl implements ApiService {
@@ -45,6 +47,20 @@ class ApiServiceImpl implements ApiService {
       (appError) {
         _appStateUtils.handleState(AppErrorState(appError: appError));
         return false;
+      },
+      (data) {
+        _appStateUtils.handleState(AppEmitState(isLoading: false));
+        return data;
+      },
+    );
+  }
+
+  @override
+  Future<List<TicketCategory>> getTicketCategories() async {
+    return await _repository.getTicketCategories().fold(
+      (appError) {
+        _appStateUtils.handleState(AppErrorState(appError: appError));
+        return [];
       },
       (data) {
         _appStateUtils.handleState(AppEmitState(isLoading: false));
