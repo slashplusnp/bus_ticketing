@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
-import '../pages/splash_page.dart';
+import '../resources/routes_manager.dart';
+
+final navigatorKey = GlobalKey<NavigatorState>();
 
 class ScrollBehaviorModified extends ScrollBehavior {
   const ScrollBehaviorModified();
@@ -29,12 +31,14 @@ class RootApp extends StatelessWidget {
       builder: (context, orientation, deviceType) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
+          navigatorKey: navigatorKey,
           theme: ThemeData(
             useMaterial3: true,
             brightness: Brightness.light,
             colorSchemeSeed: Colors.green,
           ),
-          home: const SplashPage(),
+          initialRoute: Routes.splash.name,
+          onGenerateRoute: Routes.getRoute,
         );
       },
     );
