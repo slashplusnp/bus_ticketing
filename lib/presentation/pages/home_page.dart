@@ -112,6 +112,7 @@ class HomePage extends StatelessWidget {
                               children: priceModelList
                                   .map<Widget>(
                                     (priceModel) => Container(
+                                      key: UniqueKey(),
                                       margin: const EdgeInsets.all(AppDefaults.contentPaddingSmall),
                                       child: PriceSelectionCard(
                                         onTap: () => selectedTicketPriceListNotifier.removePrice(priceModel.uId),
@@ -167,6 +168,7 @@ class HomePage extends StatelessWidget {
             final price = priceList.elementAt(index);
 
             return Container(
+              key: UniqueKey(),
               margin: const EdgeInsets.all(AppDefaults.contentPaddingSmall),
               child: PriceSelectionCard(
                 onTap: () => selectedTicketPriceListNotifier.addPrice(
@@ -195,6 +197,7 @@ class HomePage extends StatelessWidget {
       children: ticketCategories.mapIndexed(
         (index, category) {
           return Container(
+            key: UniqueKey(),
             margin: const EdgeInsets.all(AppDefaults.contentPaddingXSmall),
             child: CustomSelectionContainer<TicketCategory>(
               onTap: (_) => selectedTicketCategoryIndexNotifier.state = index,

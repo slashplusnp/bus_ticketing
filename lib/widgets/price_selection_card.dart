@@ -32,17 +32,14 @@ class PriceSelectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
+      borderRadius: const BorderRadius.all(Radius.circular(AppDefaults.contentBorderRadius)),
       child: Container(
         padding: EdgeInsets.all(size.value),
         decoration: BoxDecoration(
           border: Border.all(
             color: action == PriceSelectionAction.add ? context.primary : ColorManager.remove,
           ),
-          borderRadius: const BorderRadius.all(
-            Radius.circular(
-              AppDefaults.contentBorderRadius,
-            ),
-          ),
+          borderRadius: const BorderRadius.all(Radius.circular(AppDefaults.contentBorderRadius)),
         ),
         child: Text(
           price.toString(),
