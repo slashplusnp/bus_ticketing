@@ -8,7 +8,7 @@ import '../data/hive/hive_utils.dart';
 const String _applicationJson = 'application/json';
 const String _contentType = 'content-type';
 const String _accept = 'accept';
-const String _authorization = 'authorization';
+const String _xDeviceToken = 'x-device-token';
 
 class DioFactory {
   Dio getDio() {
@@ -19,7 +19,7 @@ class DioFactory {
     Map<String, String> headers = {
       _contentType: _applicationJson,
       _accept: _applicationJson,
-      _authorization: 'Bearer $token',
+      _xDeviceToken: '$token',
     };
 
     dio.options = BaseOptions(
