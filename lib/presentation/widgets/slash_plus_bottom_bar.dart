@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
-import '../app/constants.dart';
-import '../extensions/build_context_extensions.dart';
-import '../extensions/extensions.dart';
-import '../resources/color_manager.dart';
-import '../resources/font_manager.dart';
+import '../../app/constants.dart';
+import '../../extensions/build_context_extensions.dart';
+import '../../extensions/extensions.dart';
+import '../../resources/color_manager.dart';
+import '../../resources/font_manager.dart';
 
 class SlashPlusBottomBar extends StatelessWidget {
   const SlashPlusBottomBar({

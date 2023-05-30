@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../app/constants.dart';
-import '../extensions/build_context_extensions.dart';
-import '../resources/color_manager.dart';
+import '../../app/constants.dart';
+import '../../extensions/build_context_extensions.dart';
+import '../../resources/color_manager.dart';
 
 enum PriceSelectionCardSize {
   small(AppDefaults.contentPadding),
@@ -18,7 +18,7 @@ class PriceSelectionCard extends StatelessWidget {
   const PriceSelectionCard({
     super.key,
     this.onTap,
-    this.size = PriceSelectionCardSize.large,
+    this.size = PriceSelectionCardSize.small,
     this.action = PriceSelectionAction.add,
     required this.price,
   });
@@ -34,7 +34,7 @@ class PriceSelectionCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: const BorderRadius.all(Radius.circular(AppDefaults.contentBorderRadius)),
       child: Container(
-        padding: EdgeInsets.all(size.value),
+        padding: EdgeInsets.symmetric(horizontal: size.value, vertical: size.value / 2),
         decoration: BoxDecoration(
           border: Border.all(
             color: action == PriceSelectionAction.add ? context.primary : ColorManager.remove,

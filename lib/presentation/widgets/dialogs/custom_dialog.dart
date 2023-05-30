@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../network/error_handler.dart';
+import '../../../../../network/error_handler.dart';
 
 typedef DialogOptionBuilder<T> = Map<String, T?> Function();
 

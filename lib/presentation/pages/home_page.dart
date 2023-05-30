@@ -1,23 +1,30 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../app/constants.dart';
+import '../../data/hive/hive_utils.dart';
+import '../../data/requests/ticket_report/ticket_report_request.dart';
+import '../../data/responses/hardware_data/hardware_data_response.dart';
 import '../../data/responses/ticket_category/ticket_category_response.dart';
 import '../../extensions/build_context_extensions.dart';
 import '../../extensions/extensions.dart';
 import '../../network/api_future_providers.dart';
 import '../../providers/state_providers.dart';
+import '../../resources/hive_box_manager.dart';
 import '../../resources/string_manager.dart';
 import '../../resources/values_manager.dart';
-import '../../widgets/custom_error_builder.dart';
-import '../../widgets/custom_loading_indicator.dart';
-import '../../widgets/custom_selection_container.dart';
-import '../../widgets/price_selection_card.dart';
-import '../../widgets/save_reset_buttons.dart';
-import '../../widgets/slash_plus_bottom_bar.dart';
-import '../../widgets/widget_utils/widget_utils.dart';
+import '../../utils/utils.dart';
 import '../models/ticket_price_model.dart';
+import '../widgets/custom_error_builder.dart';
+import '../widgets/custom_loading_indicator.dart';
+import '../widgets/custom_selection_container.dart';
+import '../widgets/pos_printer_platform_widget.dart';
+import '../widgets/price_selection_card.dart';
+import '../widgets/save_reset_buttons.dart';
+import '../widgets/slash_plus_bottom_bar.dart';
+import '../widgets/widget_utils/widget_utils.dart';
 
 final homeScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
@@ -113,7 +120,10 @@ class HomePage extends StatelessWidget {
                                   .map<Widget>(
                                     (priceModel) => Container(
                                       key: UniqueKey(),
-                                      margin: const EdgeInsets.all(AppDefaults.contentPaddingSmall),
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: AppDefaults.contentPaddingSmall,
+                                        vertical: AppDefaults.contentPaddingSmall / 2,
+                                      ),
                                       child: PriceSelectionCard(
                                         onTap: () => selectedTicketPriceListNotifier.removePrice(priceModel.uId),
                                         price: priceModel.price,
@@ -135,7 +145,7 @@ class HomePage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Total:'),
+                      Text('Total (${selectedTicketPriceListWatch.length}):'),
                       Text(
                         '($totalPrice)',
                         style: context.titleSmall,
@@ -145,8 +155,55 @@ class HomePage extends StatelessWidget {
                   const Divider(height: AppDefaults.paddingLarge),
                   SaveResetCancelButtons(
                     saveTitle: AppString.print,
-                    onSave: () {},
+                    onSave: () {
+                      final hardwareData = HiveUtils.getFromObjectBox<HardwareData>(boxName: HiveBoxManager.hardwareDataBox);
+
+                      final categoryGroupedTicketPrices = selectedTicketPriceListWatch.groupListsBy((ticket) => ticket.category);
+                      final List<ReportTicketCategory> requestCategoryList = categoryGroupedTicketPrices.keys.map<ReportTicketCategory>(
+                        (key) {
+                          final tickets = categoryGroupedTicketPrices[key].orEmpty();
+                          final name = key.name.orEmpty();
+                          final count = tickets.length;
+                          final total = tickets.map((ticket) => ticket.price).fold(0, (a, b) => a + b);
+
+                          return ReportTicketCategory(
+                            id: key.id,
+                            name: name,
+                            count: count,
+                            total: total,
+                          );
+                        },
+                      ).toList();
+
+                      final TicketReportRequest reportRequest = TicketReportRequest(
+                        date: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+                        deviceId: (hardwareData?.id).orZero(),
+                        total: totalPrice,
+                        uuid: Utils.generateUUID(),
+                        category: requestCategoryList,
+                      );
+
+                      final totalPassengers = reportRequest.category
+                          ?.map(
+                            (c) => c.count,
+                          )
+                          .fold(
+                            0,
+                            (a, b) => a + b,
+                          );
+
+                      context.navigator.push(
+                        MaterialPageRoute<PosPrinterPlatformWidget>(
+                          builder: (context) => PosPrinterPlatformWidget(
+                            reportRequest: reportRequest,
+                            hardwareData: hardwareData,
+                            totalPassengers: totalPassengers.orZero(),
+                          ),
+                        ),
+                      );
+                    },
                   ),
+                  WidgetUtils.verticalSpace(AppSize.s5),
                 ],
               );
       },
@@ -169,7 +226,10 @@ class HomePage extends StatelessWidget {
 
             return Container(
               key: UniqueKey(),
-              margin: const EdgeInsets.all(AppDefaults.contentPaddingSmall),
+              margin: const EdgeInsets.symmetric(
+                horizontal: AppDefaults.contentPaddingSmall,
+                vertical: AppDefaults.contentPaddingSmall / 2,
+              ),
               child: PriceSelectionCard(
                 onTap: () => selectedTicketPriceListNotifier.addPrice(
                   TicketPriceModel(

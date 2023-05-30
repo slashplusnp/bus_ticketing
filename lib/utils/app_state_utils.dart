@@ -8,8 +8,8 @@ import '../presentation/pages/home_page.dart';
 import '../providers/app_state/app_state.dart';
 import '../resources/hive_box_manager.dart';
 import '../resources/routes_manager.dart';
-import '../widgets/dialogs/custom_dialog.dart';
-import '../widgets/dialogs/loading_widget.dart';
+import '../presentation/widgets/dialogs/custom_dialog.dart';
+import '../presentation/widgets/dialogs/loading_widget.dart';
 
 class AppStateUtils {
   void handleState(AppState appState) {

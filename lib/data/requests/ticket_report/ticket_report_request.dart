@@ -5,10 +5,12 @@ part 'ticket_report_request.g.dart';
 @JsonSerializable()
 class ReportTicketCategory {
   final int id;
+  final String name;
   final int count;
   final int total;
   ReportTicketCategory({
     required this.id,
+    required this.name,
     required this.count,
     required this.total,
   });
@@ -18,11 +20,13 @@ class ReportTicketCategory {
 
   ReportTicketCategory copyWith({
     int? id,
+    String? name,
     int? count,
     int? total,
   }) {
     return ReportTicketCategory(
       id: id ?? this.id,
+      name: name ?? this.name,
       count: count ?? this.count,
       total: total ?? this.total,
     );

@@ -16,9 +16,9 @@ import '../../resources/routes_manager.dart';
 import '../../resources/string_manager.dart';
 import '../../resources/values_manager.dart';
 import '../../utils/form_validation_utils.dart';
-import '../../widgets/custom_elevated_button.dart';
-import '../../widgets/slash_plus_bottom_bar.dart';
-import '../../widgets/widget_utils/widget_utils.dart';
+import '../widgets/custom_elevated_button.dart';
+import '../widgets/slash_plus_bottom_bar.dart';
+import '../widgets/widget_utils/widget_utils.dart';
 
 final buttonPressedProvider = StateProvider.autoDispose<bool>((ref) => false);
 

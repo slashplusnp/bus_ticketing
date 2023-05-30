@@ -10,6 +10,7 @@ ReportTicketCategory _$ReportTicketCategoryFromJson(
         Map<String, dynamic> json) =>
     ReportTicketCategory(
       id: json['id'] as int,
+      name: json['name'] as String,
       count: json['count'] as int,
       total: json['total'] as int,
     );
@@ -18,6 +19,7 @@ Map<String, dynamic> _$ReportTicketCategoryToJson(
         ReportTicketCategory instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'name': instance.name,
       'count': instance.count,
       'total': instance.total,
     };
