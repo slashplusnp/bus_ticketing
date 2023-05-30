@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/constants.dart';
 import '../../extensions/build_context_extensions.dart';
+import '../../resources/font_manager.dart';
 
 class CustomSelectionContainer<T> extends StatelessWidget {
   const CustomSelectionContainer({
@@ -23,7 +24,7 @@ class CustomSelectionContainer<T> extends StatelessWidget {
       onTap: () => onTap.call(value),
       borderRadius: const BorderRadius.all(Radius.circular(AppDefaults.contentBorderRadius)),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: AppDefaults.padding, vertical: AppDefaults.contentPadding),
+        padding: const EdgeInsets.symmetric(horizontal: AppDefaults.contentPadding, vertical: AppDefaults.contentPaddingSmall),
         decoration: BoxDecoration(
           color: isSelected ? context.primary : null,
           border: Border.all(color: context.primary),
@@ -31,7 +32,11 @@ class CustomSelectionContainer<T> extends StatelessWidget {
         ),
         child: Text(
           title,
-          style: context.titleMedium?.apply(color: isSelected ? context.scaffoldBackground : context.primary),
+          softWrap: true,
+          style: context.titleMedium?.copyWith(
+            color: isSelected ? context.scaffoldBackground : context.primary,
+            fontSize: FontSize.fs14,
+          ),
         ),
       ),
     );

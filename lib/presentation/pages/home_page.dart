@@ -115,24 +115,23 @@ class HomePage extends StatelessWidget {
                           Text('$key (${priceModelList.length}):'),
                           WidgetUtils.horizontalSpace(AppSize.s2),
                           Expanded(
-                            child: Wrap(
-                              children: priceModelList
-                                  .map<Widget>(
-                                    (priceModel) => Container(
-                                      key: UniqueKey(),
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: AppDefaults.contentPaddingSmall,
-                                        vertical: AppDefaults.contentPaddingSmall / 2,
-                                      ),
-                                      child: PriceSelectionCard(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: AppDefaults.contentPaddingXXSmall),
+                              child: Wrap(
+                                spacing: AppDefaults.contentPaddingSmall,
+                                runSpacing: AppDefaults.contentPaddingSmall / 2,
+                                children: priceModelList
+                                    .map<Widget>(
+                                      (priceModel) => PriceSelectionCard(
+                                        key: UniqueKey(),
                                         onTap: () => selectedTicketPriceListNotifier.removePrice(priceModel.uId),
                                         price: priceModel.price,
                                         action: PriceSelectionAction.remove,
                                         size: PriceSelectionCardSize.small,
                                       ),
-                                    ),
-                                  )
-                                  .toList(),
+                                    )
+                                    .toList(),
+                              ),
                             ),
                           ),
                           WidgetUtils.horizontalSpace(AppSize.s2),
@@ -220,25 +219,21 @@ class HomePage extends StatelessWidget {
       child: Wrap(
         direction: Axis.horizontal,
         alignment: WrapAlignment.spaceAround,
+        spacing: AppDefaults.contentPaddingSmall,
+        runSpacing: AppDefaults.contentPaddingSmall / 2,
         children: priceList.mapIndexed(
           (index, category) {
             final price = priceList.elementAt(index);
 
-            return Container(
+            return PriceSelectionCard(
               key: UniqueKey(),
-              margin: const EdgeInsets.symmetric(
-                horizontal: AppDefaults.contentPaddingSmall,
-                vertical: AppDefaults.contentPaddingSmall / 2,
-              ),
-              child: PriceSelectionCard(
-                onTap: () => selectedTicketPriceListNotifier.addPrice(
-                  TicketPriceModel(
-                    category: ticketCategory,
-                    price: price,
-                  ),
+              onTap: () => selectedTicketPriceListNotifier.addPrice(
+                TicketPriceModel(
+                  category: ticketCategory,
+                  price: price,
                 ),
-                price: price,
               ),
+              price: price,
             );
           },
         ).toList(),
@@ -254,16 +249,16 @@ class HomePage extends StatelessWidget {
     return Wrap(
       direction: Axis.horizontal,
       alignment: WrapAlignment.spaceAround,
+      spacing: AppDefaults.contentPaddingXXSmall,
+      runSpacing: AppDefaults.contentPaddingXSmall,
+
       children: ticketCategories.mapIndexed(
         (index, category) {
-          return Container(
+          return CustomSelectionContainer<TicketCategory>(
             key: UniqueKey(),
-            margin: const EdgeInsets.all(AppDefaults.contentPaddingXSmall),
-            child: CustomSelectionContainer<TicketCategory>(
-              onTap: (_) => selectedTicketCategoryIndexNotifier.state = index,
-              isSelected: selectedTicketCategoryIndexWatch == index,
-              title: category.name.orEmptyDashed(),
-            ),
+            onTap: (_) => selectedTicketCategoryIndexNotifier.state = index,
+            isSelected: selectedTicketCategoryIndexWatch == index,
+            title: category.name.orEmptyDashed(),
           );
         },
       ).toList(),
