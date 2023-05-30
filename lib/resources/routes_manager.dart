@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart' show Widget, RouteSettings, Scaffold, AppBar, Text, Route, MaterialPageRoute;
 
-import '../pages/home_page.dart';
-import '../pages/login_page.dart';
-import '../pages/splash_page.dart';
+import '../presentation/pages/home_page.dart';
+import '../presentation/pages/login_page.dart';
+import '../presentation/pages/splash_page.dart';
 import 'string_manager.dart';
 
 enum Routes {

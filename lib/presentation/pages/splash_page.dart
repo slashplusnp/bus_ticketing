@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../app/constants.dart';
-import '../data/hive/hive_utils.dart';
-import '../data/responses/hardware_data/hardware_data_response.dart';
-import '../extensions/build_context_extensions.dart';
-import '../resources/hive_box_manager.dart';
-import '../resources/routes_manager.dart';
-import '../resources/string_manager.dart';
+import '../../app/constants.dart';
+import '../../data/hive/hive_utils.dart';
+import '../../data/responses/hardware_data/hardware_data_response.dart';
+import '../../extensions/build_context_extensions.dart';
+import '../../resources/hive_box_manager.dart';
+import '../../resources/routes_manager.dart';
+import '../../resources/string_manager.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});

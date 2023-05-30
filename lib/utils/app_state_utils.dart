@@ -4,7 +4,7 @@ import '../app/root_app.dart';
 import '../data/hive/hive_utils.dart';
 import '../data/responses/hardware_data/hardware_data_response.dart';
 import '../network/error_handler.dart';
-import '../pages/home_page.dart';
+import '../presentation/pages/home_page.dart';
 import '../providers/app_state/app_state.dart';
 import '../resources/hive_box_manager.dart';
 import '../resources/routes_manager.dart';
