@@ -1,6 +1,7 @@
 class HiveBoxManager {
   static const settingsBox = 'settingsBox';
   static const hardwareDataBox = 'hardwareDataBox';
+  static const ticketCategoryBox = 'ticketCategoryBox';
 }
 
 class HiveKeyManager {

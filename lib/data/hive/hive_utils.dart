@@ -1,7 +1,9 @@
+import 'package:collection/collection.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../resources/hive_box_manager.dart';
 import '../responses/hardware_data/hardware_data_response.dart';
+import '../responses/ticket_category/ticket_category_response.dart';
 
 class HiveUtils {
   const HiveUtils._internal();
@@ -12,11 +14,13 @@ class HiveUtils {
 
   static void registerAdapters() {
     Hive.registerAdapter(HardwareDataAdapter()); // 0
+    Hive.registerAdapter(TicketCategoryAdapter()); // 1
   }
 
   static Future<void> openBoxes() async {
     await Hive.openBox<dynamic>(HiveBoxManager.settingsBox);
     await Hive.openBox<HardwareData>(HiveBoxManager.hardwareDataBox);
+    await Hive.openBox<TicketCategory>(HiveBoxManager.ticketCategoryBox);
   }
 
   static void storeToBox<T>({
@@ -59,5 +63,17 @@ class HiveUtils {
     if (box.isEmpty) return null;
     final data = box.values.last;
     return data.token;
+  }
+
+  static void updateBox<T>(String boxName, {required List<T> data}) {
+    final box = Hive.box<T>(boxName);
+
+    final values = box.values.toList();
+    final isSame = const DeepCollectionEquality().equals(data, values);
+
+    if (!isSame) {
+      box.clear();
+      box.addAll(data);
+    }
   }
 }

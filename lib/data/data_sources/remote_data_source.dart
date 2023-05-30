@@ -1,7 +1,7 @@
 import '../../network/app_service_client.dart';
 import '../requests/login_request/login_request.dart';
 import '../responses/hardware_data/hardware_data_response.dart';
-import '../responses/ticket_category/ticket_category.dart';
+import '../responses/ticket_category/ticket_category_response.dart';
 
 abstract class RemoteDataSource {
   Future<HardwareDataResponse> login(LoginRequest loginRequest);

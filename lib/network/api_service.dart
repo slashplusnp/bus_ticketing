@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../data/repository/repository.dart';
 import '../data/requests/login_request/login_request.dart';
 import '../data/responses/hardware_data/hardware_data_response.dart';
-import '../data/responses/ticket_category/ticket_category.dart';
+import '../data/responses/ticket_category/ticket_category_response.dart';
 import '../providers/app_state/app_state.dart';
 import '../resources/string_manager.dart';
 import '../utils/app_state_utils.dart';

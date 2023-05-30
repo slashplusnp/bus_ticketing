@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../extensions/extensions.dart';
 import '../../network/error_handler.dart';
@@ -8,7 +9,7 @@ import '../data_sources/remote_data_source.dart';
 import '../hive/hive_utils.dart';
 import '../requests/login_request/login_request.dart';
 import '../responses/hardware_data/hardware_data_response.dart';
-import '../responses/ticket_category/ticket_category.dart';
+import '../responses/ticket_category/ticket_category_response.dart';
 
 abstract class Repository {
   Future<Either<AppError, HardwareData?>> login(LoginRequest loginRequest);
@@ -60,13 +61,19 @@ class RepositoryImpl implements Repository {
       return Left(AppError.fromError(error));
     }
   }
-  
+
   @override
   Future<Either<AppError, List<TicketCategory>>> getTicketCategories() async {
-    if (!(await _networkInfo.isConnected)) return const Left(AppErrorNoInternetConnection());
+    final ticketCategoryBox = Hive.box<TicketCategory>(HiveBoxManager.ticketCategoryBox);
+    if (!(await _networkInfo.isConnected)) return Right(ticketCategoryBox.values.toList());
 
     try {
       final response = await _remoteDataSource.getTicketCategories();
+
+      HiveUtils.updateBox<TicketCategory>(
+        HiveBoxManager.ticketCategoryBox,
+        data: response.data.orEmpty(),
+      );
 
       return Right(response.data.orEmpty());
     } catch (error) {

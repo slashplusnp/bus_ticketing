@@ -15,4 +15,5 @@ class AppString {
   static const save = 'Save';
   static const reset = 'Reset';
   static const cancel = 'Cancel';
+  static const print = 'Print';
 }

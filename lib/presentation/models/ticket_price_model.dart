@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../data/responses/ticket_category/ticket_category.dart';
+import '../../data/responses/ticket_category/ticket_category_response.dart';
 
 class TicketPriceModel {
   final UniqueKey uId;
