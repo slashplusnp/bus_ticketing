@@ -1,8 +1,8 @@
 import 'package:either_dart/either.dart';
-import 'package:flutter/material.dart';
 
 import '../data/repository/repository.dart';
 import '../data/requests/login_request/login_request.dart';
+import '../data/requests/ticket_report/ticket_report_request.dart';
 import '../data/responses/hardware_data/hardware_data_response.dart';
 import '../data/responses/ticket_category/ticket_category_response.dart';
 import '../providers/app_state/app_state.dart';
@@ -10,9 +10,10 @@ import '../resources/string_manager.dart';
 import '../utils/app_state_utils.dart';
 
 abstract class ApiService {
-  Future<HardwareData?> login(BuildContext context, {required LoginRequest loginRequest});
-  Future<bool> logout(BuildContext context);
+  Future<HardwareData?> login({required LoginRequest loginRequest});
+  Future<bool> logout();
   Future<List<TicketCategory>> getTicketCategories();
+  Future<List<String>> postTicketReport({required List<TicketReportRequest> ticketReports});
 }
 
 class ApiServiceImpl implements ApiService {
@@ -21,7 +22,7 @@ class ApiServiceImpl implements ApiService {
   ApiServiceImpl(this._repository, this._appStateUtils);
 
   @override
-  Future<HardwareData?> login(BuildContext context, {required LoginRequest loginRequest}) async {
+  Future<HardwareData?> login({required LoginRequest loginRequest}) async {
     return await _repository.login(loginRequest).fold(
       (appError) {
         _appStateUtils.handleState(AppErrorState(appError: appError));
@@ -35,7 +36,7 @@ class ApiServiceImpl implements ApiService {
   }
 
   @override
-  Future<bool> logout(BuildContext context) async {
+  Future<bool> logout() async {
     _appStateUtils.handleState(
       AppEmitState(
         isLoading: true,
@@ -58,6 +59,20 @@ class ApiServiceImpl implements ApiService {
   @override
   Future<List<TicketCategory>> getTicketCategories() async {
     return await _repository.getTicketCategories().fold(
+      (appError) {
+        _appStateUtils.handleState(AppErrorState(appError: appError));
+        return [];
+      },
+      (data) {
+        _appStateUtils.handleState(AppEmitState(isLoading: false));
+        return data;
+      },
+    );
+  }
+
+  @override
+  Future<List<String>> postTicketReport({required List<TicketReportRequest> ticketReports}) async {
+    return await _repository.postTicketReport(ticketReports).fold(
       (appError) {
         _appStateUtils.handleState(AppErrorState(appError: appError));
         return [];

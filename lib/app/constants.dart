@@ -14,6 +14,7 @@ class UrlConstants {
   // url path
   static const loginUrl = '/ticket/login';
   static const categoryUrl = '/ticket/category';
+  static const reportSaveUrl = '/ticket/reportSave';
 }
 
 class Constants {

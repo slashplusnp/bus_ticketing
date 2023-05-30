@@ -81,7 +81,6 @@ class _LoginFormWidget extends StatelessWidget {
                             buttonPressedNotifier.state = true;
                             apiService
                                 .login(
-                              context,
                               loginRequest: LoginRequest(
                                 identifier: identifierController.text,
                               ),

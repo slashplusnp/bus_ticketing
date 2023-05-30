@@ -330,7 +330,7 @@ class _MyAppState extends State<PosPrinterPlatformWidget> {
                                   : () async {
                                       _printReceiveTest().then(
                                         (value) {
-                                          Navigator.of(context).pop();
+                                          Navigator.of(context).pop(true);
                                         },
                                       );
                                     },

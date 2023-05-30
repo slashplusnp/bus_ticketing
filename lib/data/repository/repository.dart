@@ -8,6 +8,7 @@ import '../../resources/hive_box_manager.dart';
 import '../data_sources/remote_data_source.dart';
 import '../hive/hive_utils.dart';
 import '../requests/login_request/login_request.dart';
+import '../requests/ticket_report/ticket_report_request.dart';
 import '../responses/hardware_data/hardware_data_response.dart';
 import '../responses/ticket_category/ticket_category_response.dart';
 
@@ -15,6 +16,7 @@ abstract class Repository {
   Future<Either<AppError, HardwareData?>> login(LoginRequest loginRequest);
   Future<Either<AppError, bool>> logout();
   Future<Either<AppError, List<TicketCategory>>> getTicketCategories();
+  Future<Either<AppError, List<String>>> postTicketReport(List<TicketReportRequest> ticketReports);
 }
 
 class RepositoryImpl implements Repository {
@@ -74,6 +76,20 @@ class RepositoryImpl implements Repository {
         HiveBoxManager.ticketCategoryBox,
         data: response.data.orEmpty(),
       );
+
+      return Right(response.data.orEmpty());
+    } catch (error) {
+      return Left(AppError.fromError(error));
+    }
+  }
+
+  @override
+  Future<Either<AppError, List<String>>> postTicketReport(List<TicketReportRequest> ticketReports) async {
+    // final ticketCategoryBox = Hive.box<TicketCategory>(HiveBoxManager.ticketCategoryBox);
+    // if (!(await _networkInfo.isConnected)) return Right(ticketCategoryBox.values.toList());
+
+    try {
+      final response = await _remoteDataSource.postTicketReport(ticketReports);
 
       return Right(response.data.orEmpty());
     } catch (error) {

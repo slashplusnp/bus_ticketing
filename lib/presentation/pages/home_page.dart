@@ -1,9 +1,12 @@
+import 'dart:developer';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/constants.dart';
+import '../../app/dependency_injection.dart';
 import '../../data/hive/hive_utils.dart';
 import '../../data/requests/ticket_report/ticket_report_request.dart';
 import '../../data/responses/hardware_data/hardware_data_response.dart';
@@ -11,6 +14,7 @@ import '../../data/responses/ticket_category/ticket_category_response.dart';
 import '../../extensions/build_context_extensions.dart';
 import '../../extensions/extensions.dart';
 import '../../network/api_future_providers.dart';
+import '../../network/api_service.dart';
 import '../../providers/state_providers.dart';
 import '../../resources/hive_box_manager.dart';
 import '../../resources/string_manager.dart';
@@ -157,6 +161,8 @@ class HomePage extends StatelessWidget {
                     onSave: () {
                       final hardwareData = HiveUtils.getFromObjectBox<HardwareData>(boxName: HiveBoxManager.hardwareDataBox);
 
+                      log((hardwareData?.toJson()).toString());
+
                       final categoryGroupedTicketPrices = selectedTicketPriceListWatch.groupListsBy((ticket) => ticket.category);
                       final List<ReportTicketCategory> requestCategoryList = categoryGroupedTicketPrices.keys.map<ReportTicketCategory>(
                         (key) {
@@ -191,14 +197,23 @@ class HomePage extends StatelessWidget {
                             (a, b) => a + b,
                           );
 
-                      context.navigator.push(
-                        MaterialPageRoute<PosPrinterPlatformWidget>(
+                      context.navigator
+                          .push<bool>(
+                        MaterialPageRoute<bool>(
                           builder: (context) => PosPrinterPlatformWidget(
                             reportRequest: reportRequest,
                             hardwareData: hardwareData,
                             totalPassengers: totalPassengers.orZero(),
                           ),
                         ),
+                      )
+                          .then<void>(
+                        (hasPrinted) {
+                          if (hasPrinted.orFalse()) {
+                            final ApiService apiService = getInstance<ApiService>();
+                            apiService.postTicketReport(ticketReports: [reportRequest]);
+                          }
+                        },
                       );
                     },
                   ),
@@ -251,7 +266,6 @@ class HomePage extends StatelessWidget {
       alignment: WrapAlignment.spaceAround,
       spacing: AppDefaults.contentPaddingXXSmall,
       runSpacing: AppDefaults.contentPaddingXSmall,
-
       children: ticketCategories.mapIndexed(
         (index, category) {
           return CustomSelectionContainer<TicketCategory>(
