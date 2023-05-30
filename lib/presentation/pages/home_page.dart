@@ -211,7 +211,9 @@ class HomePage extends StatelessWidget {
                         (hasPrinted) {
                           if (hasPrinted.orFalse()) {
                             final ApiService apiService = getInstance<ApiService>();
-                            apiService.postTicketReport(ticketReports: [reportRequest]);
+                            apiService.postTicketReport(ticketReports: [reportRequest]).then(
+                              (value) => ref.invalidate(selectedTicketPriceListProvider),
+                            );
                           }
                         },
                       );
