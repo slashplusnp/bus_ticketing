@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'ticket_report_request.g.dart';
+
+@JsonSerializable()
 class ReportTicketCategory {
   final int id;
   final int count;
@@ -7,6 +12,9 @@ class ReportTicketCategory {
     required this.count,
     required this.total,
   });
+
+  factory ReportTicketCategory.fromJson(Map<String, dynamic> json) => _$ReportTicketCategoryFromJson(json);
+  Map<String, dynamic> toJson() => _$ReportTicketCategoryToJson(this);
 
   ReportTicketCategory copyWith({
     int? id,
@@ -21,6 +29,7 @@ class ReportTicketCategory {
   }
 }
 
+@JsonSerializable()
 class TicketReportRequest {
   final String? date;
   final String? uuid;
@@ -34,6 +43,9 @@ class TicketReportRequest {
     this.total,
     this.category,
   });
+
+  factory TicketReportRequest.fromJson(Map<String, dynamic> json) => _$TicketReportRequestFromJson(json);
+  Map<String, dynamic> toJson() => _$TicketReportRequestToJson(this);
 
   TicketReportRequest copyWith({
     String? date,
