@@ -7,7 +7,7 @@ part of 'ticket_report_request.dart';
 // **************************************************************************
 
 ReportTicketCategory _$ReportTicketCategoryFromJson(
-        Map<String, dynamic> json,) =>
+        Map<String, dynamic> json) =>
     ReportTicketCategory(
       id: json['id'] as int,
       count: json['count'] as int,
@@ -15,7 +15,7 @@ ReportTicketCategory _$ReportTicketCategoryFromJson(
     );
 
 Map<String, dynamic> _$ReportTicketCategoryToJson(
-        ReportTicketCategory instance,) =>
+        ReportTicketCategory instance) =>
     <String, dynamic>{
       'id': instance.id,
       'count': instance.count,
@@ -34,7 +34,7 @@ TicketReportRequest _$TicketReportRequestFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$TicketReportRequestToJson(
-        TicketReportRequest instance,) =>
+        TicketReportRequest instance) =>
     <String, dynamic>{
       'date': instance.date,
       'uuid': instance.uuid,

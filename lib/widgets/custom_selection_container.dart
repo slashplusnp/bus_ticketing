@@ -19,22 +19,19 @@ class CustomSelectionContainer<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: AppDefaults.contentPaddingXSmall),
-      child: InkWell(
-        onTap: () => onTap.call(value),
-        borderRadius: const BorderRadius.all(Radius.circular(AppDefaults.contentBorderRadius)),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppDefaults.padding, vertical: AppDefaults.contentPadding),
-          decoration: BoxDecoration(
-            color: isSelected ? context.primary : null,
-            border: Border.all(color: context.primary),
-            borderRadius: const BorderRadius.all(Radius.circular(AppDefaults.contentBorderRadius)),
-          ),
-          child: Text(
-            title,
-            style: context.titleMedium?.apply(color: isSelected ? context.scaffoldBackground : context.primary),
-          ),
+    return InkWell(
+      onTap: () => onTap.call(value),
+      borderRadius: const BorderRadius.all(Radius.circular(AppDefaults.contentBorderRadius)),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: AppDefaults.padding, vertical: AppDefaults.contentPadding),
+        decoration: BoxDecoration(
+          color: isSelected ? context.primary : null,
+          border: Border.all(color: context.primary),
+          borderRadius: const BorderRadius.all(Radius.circular(AppDefaults.contentBorderRadius)),
+        ),
+        child: Text(
+          title,
+          style: context.titleMedium?.apply(color: isSelected ? context.scaffoldBackground : context.primary),
         ),
       ),
     );

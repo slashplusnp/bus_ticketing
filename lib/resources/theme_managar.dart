@@ -12,6 +12,9 @@ class ThemeManager {
         seedColor: ColorManager.primary,
         brightness: Brightness.light,
       ),
+      appBarTheme: const AppBarTheme(
+        centerTitle: true,
+      ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: ColorManager.primary,
       ),

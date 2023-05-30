@@ -27,103 +27,110 @@ class LoginPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = GlobalKey<FormState>();
-    final identifierController = TextEditingController();
-
-    final buttonPressedWatch = ref.watch(buttonPressedProvider);
-    final buttonPressedNotifier = ref.watch(buttonPressedProvider.notifier);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(Constants.appTitle),
-        centerTitle: true,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppDefaults.padding),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextFormField(
-                      controller: identifierController,
-                      validator: (value) => FormValidationUtils.formFieldValidator(value: value, fieldName: AppString.identifier),
-                      decoration: const InputDecoration(
-                        labelText: AppString.identifier,
-                        hintText: AppString.identifierHint,
-                      ),
-                    ),
-                    WidgetUtils.verticalSpace(10.h),
-                    CustomElevatedButton(
-                      buttonColor: context.primary,
-                      onPressed: buttonPressedWatch
-                          ? null
-                          : () {
-                              if ((formKey.currentState?.validate()).orFalse()) {
-                                formKey.currentState?.save();
-                                final ApiService apiService = getInstance<ApiService>();
+      body: const SlashPlusBottomBar(
+        child: _LoginFormWidget(),
+      ),
+    );
+  }
+}
 
-                                HiveUtils.clearBox<HardwareData>(boxName: HiveBoxManager.hardwareDataBox);
+class _LoginFormWidget extends StatelessWidget {
+  const _LoginFormWidget();
 
-                                buttonPressedNotifier.state = true;
-                                apiService
-                                    .login(
-                                  context,
-                                  loginRequest: LoginRequest(
-                                    identifier: identifierController.text,
-                                  ),
-                                )
-                                    .then(
-                                  (data) async {
-                                    if (data != null) {
-                                      HiveUtils.storeToObjectBox(
-                                        boxName: HiveBoxManager.hardwareDataBox,
-                                        boxModel: data,
-                                      );
+  @override
+  Widget build(BuildContext context) {
+    final formKey = GlobalKey<FormState>();
+    final identifierController = TextEditingController();
 
-                                      await DependencyInjection.reset().then((_) {
-                                        context.navigator.pushNamedAndRemoveUntil(
-                                          Routes.home.name,
-                                          (route) => false,
-                                        );
-                                      });
-                                    } else {
-                                      buttonPressedNotifier.state = false;
-                                    }
-                                  },
-                                );
-                              }
-                            },
-                      title: buttonPressedWatch
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  height: AppSize.s20,
-                                  width: AppSize.s20,
-                                  child: FittedBox(
-                                    child: CircularProgressIndicator(
-                                      color: ColorManager.background,
-                                    ),
-                                  ),
-                                ),
-                                WidgetUtils.horizontalSpace(AppSize.s10),
-                                const Text(AppLoadingString.login),
-                              ],
-                            )
-                          : const Text(AppString.submit),
-                    ),
-                  ],
+    return Consumer(
+      builder: (context, ref, _) {
+        final buttonPressedWatch = ref.watch(buttonPressedProvider);
+        final buttonPressedNotifier = ref.watch(buttonPressedProvider.notifier);
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppDefaults.padding),
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextFormField(
+                  controller: identifierController,
+                  validator: (value) => FormValidationUtils.formFieldValidator(value: value, fieldName: AppString.identifier),
+                  decoration: const InputDecoration(
+                    labelText: AppString.identifier,
+                    hintText: AppString.identifierHint,
+                  ),
                 ),
-              ),
+                WidgetUtils.verticalSpace(10.h),
+                CustomElevatedButton(
+                  buttonColor: context.primary,
+                  onPressed: buttonPressedWatch
+                      ? null
+                      : () {
+                          if ((formKey.currentState?.validate()).orFalse()) {
+                            formKey.currentState?.save();
+                            final ApiService apiService = getInstance<ApiService>();
+
+                            HiveUtils.clearBox<HardwareData>(boxName: HiveBoxManager.hardwareDataBox);
+
+                            buttonPressedNotifier.state = true;
+                            apiService
+                                .login(
+                              context,
+                              loginRequest: LoginRequest(
+                                identifier: identifierController.text,
+                              ),
+                            )
+                                .then(
+                              (data) async {
+                                if (data != null) {
+                                  HiveUtils.storeToObjectBox(
+                                    boxName: HiveBoxManager.hardwareDataBox,
+                                    boxModel: data,
+                                  );
+
+                                  await DependencyInjection.reset().then((_) {
+                                    context.navigator.pushNamedAndRemoveUntil(
+                                      Routes.home.name,
+                                      (route) => false,
+                                    );
+                                  });
+                                } else {
+                                  buttonPressedNotifier.state = false;
+                                }
+                              },
+                            );
+                          }
+                        },
+                  title: buttonPressedWatch
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              height: AppSize.s20,
+                              width: AppSize.s20,
+                              child: FittedBox(
+                                child: CircularProgressIndicator(
+                                  color: ColorManager.background,
+                                ),
+                              ),
+                            ),
+                            WidgetUtils.horizontalSpace(AppSize.s10),
+                            const Text(AppLoadingString.login),
+                          ],
+                        )
+                      : const Text(AppString.submit),
+                ),
+              ],
             ),
           ),
-          const SlashPlusBottomBar(),
-        ],
-      ),
+        );
+      },
     );
   }
 }
