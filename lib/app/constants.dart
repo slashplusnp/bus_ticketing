@@ -30,6 +30,8 @@ class Constants {
 }
 
 class AppDefaults {
+  static const printerName = ['InnerPrinter'];
+
   static const connectionTimeOutSeconds = 60;
   static const splashSec = 1;
 
@@ -53,5 +55,4 @@ class AppDefaults {
   static const paddingLarge = 16.0;
   static const paddingXLarge = 18.0;
   static const paddingXXLarge = 24.0;
-
 }

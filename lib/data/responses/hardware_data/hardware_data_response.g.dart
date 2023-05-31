@@ -103,5 +103,5 @@ Map<String, dynamic> _$HardwareDataResponseToJson(
     <String, dynamic>{
       'error': instance.error,
       'errorMessage': instance.errorMessage,
-      'data': instance.data,
+      'data': instance.data?.toJson(),
     };

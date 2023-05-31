@@ -19,12 +19,12 @@ import '../../providers/state_providers.dart';
 import '../../resources/hive_box_manager.dart';
 import '../../resources/string_manager.dart';
 import '../../resources/values_manager.dart';
+import '../../utils/pos_pirnter_utils.dart';
 import '../../utils/utils.dart';
 import '../models/ticket_price_model.dart';
 import '../widgets/custom_error_builder.dart';
 import '../widgets/custom_loading_indicator.dart';
 import '../widgets/custom_selection_container.dart';
-import '../widgets/pos_printer_platform_widget.dart';
 import '../widgets/price_selection_card.dart';
 import '../widgets/save_reset_buttons.dart';
 import '../widgets/slash_plus_bottom_bar.dart';
@@ -184,7 +184,7 @@ class HomePage extends StatelessWidget {
                         date: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
                         deviceId: (hardwareData?.id).orZero(),
                         total: totalPrice,
-                        uuid: Utils.generateUUID(),
+                        uuid: '${Utils.generateUUID()}-${DateTime.now().millisecondsSinceEpoch}',
                         category: requestCategoryList,
                       );
 
@@ -197,26 +197,37 @@ class HomePage extends StatelessWidget {
                             (a, b) => a + b,
                           );
 
-                      context.navigator
-                          .push<bool>(
-                        MaterialPageRoute<bool>(
-                          builder: (context) => PosPrinterPlatformWidget(
-                            reportRequest: reportRequest,
-                            hardwareData: hardwareData,
-                            totalPassengers: totalPassengers.orZero(),
-                          ),
-                        ),
-                      )
-                          .then<void>(
-                        (hasPrinted) {
-                          if (hasPrinted.orFalse()) {
-                            final ApiService apiService = getInstance<ApiService>();
-                            apiService.postTicketReport(ticketReports: [reportRequest]).then(
-                              (value) => ref.invalidate(selectedTicketPriceListProvider),
-                            );
-                          }
-                        },
+                      final ApiService apiService = getInstance<ApiService>();
+
+                      PosPrinterUtils.printTicket(
+                        reportRequest: reportRequest,
+                        hardwareData: hardwareData,
+                        totalPassengers: totalPassengers.orZero(),
                       );
+                      apiService.postTicketReport(ticketReports: [reportRequest]).then((_) {
+                        return ref.invalidate(selectedTicketPriceListProvider);
+                      });
+
+                      // context.navigator
+                      //     .push<bool>(
+                      //   MaterialPageRoute<bool>(
+                      //     builder: (context) => PosPrinterPlatformWidget(
+                      //       reportRequest: reportRequest,
+                      //       hardwareData: hardwareData,
+                      //       totalPassengers: totalPassengers.orZero(),
+                      //     ),
+                      //   ),
+                      // )
+                      //     .then<void>(
+                      //   (hasPrinted) {
+                      //     if (hasPrinted.orFalse()) {
+                      //       final ApiService apiService = getInstance<ApiService>();
+                      //       apiService.postTicketReport(ticketReports: [reportRequest]).then(
+                      //         (value) => ref.invalidate(selectedTicketPriceListProvider),
+                      //       );
+                      //     }
+                      //   },
+                      // );
                     },
                   ),
                   WidgetUtils.verticalSpace(AppSize.s5),

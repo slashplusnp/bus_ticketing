@@ -85,5 +85,5 @@ Map<String, dynamic> _$TicketCategoryResponseToJson(
     <String, dynamic>{
       'error': instance.error,
       'errorMessage': instance.errorMessage,
-      'data': instance.data,
+      'data': instance.data?.map((e) => e.toJson()).toList(),
     };

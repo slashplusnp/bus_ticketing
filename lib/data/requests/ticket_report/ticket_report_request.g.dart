@@ -42,5 +42,5 @@ Map<String, dynamic> _$TicketReportRequestToJson(
       'uuid': instance.uuid,
       'device_id': instance.deviceId,
       'total': instance.total,
-      'category': instance.category,
+      'category': instance.category?.map((e) => e.toJson()).toList(),
     };

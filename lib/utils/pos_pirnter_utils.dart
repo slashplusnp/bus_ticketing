@@ -1,8 +1,9 @@
-import 'dart:io';
+import 'dart:async';
 
 import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
 import 'package:flutter_pos_printer_platform/flutter_pos_printer_platform.dart';
 
+import '../app/constants.dart';
 import '../data/requests/ticket_report/ticket_report_request.dart';
 import '../data/responses/hardware_data/hardware_data_response.dart';
 import '../extensions/extensions.dart';
@@ -32,61 +33,27 @@ class BluetoothPrinter {
 }
 
 class PosPrinterUtils {
-  const PosPrinterUtils._internal();
-  static const _instance = PosPrinterUtils._internal();
-  factory PosPrinterUtils() => _instance;
+  static final _printerManager = PrinterManager.instance;
 
-  static var defaultPrinterType = PrinterType.bluetooth;
-  static const _isBle = false;
-  static const _reconnect = false;
-  static var printerManager = PrinterManager.instance;
-  static const BTStatus _currentStatus = BTStatus.none;
-  static List<int>? pendingTask;
-
-  static late BluetoothPrinter bluetoothPrinter;
-
-  static Future<bool> _scan() async {
-    printerManager.discovery(type: defaultPrinterType, isBle: _isBle).listen((device) {
-      bluetoothPrinter = BluetoothPrinter(
-        deviceName: device.name,
-        address: device.address,
-        isBle: _isBle,
-        vendorId: device.vendorId,
-        productId: device.productId,
-        typePrinter: defaultPrinterType,
-      );
-    });
-    await Future<void>.delayed(const Duration(seconds: 2));
-    return true;
-  }
-
-  static void _printEscPos(List<int> bytes, Generator generator) async {
-    await _scan();
-
+  static Future<bool> _printEscPos(
+    List<int> bytes,
+    Generator generator, {
+    required BluetoothPrinter bluetoothPrinter,
+  }) async {
     bytes += generator.cut();
-    await printerManager.connect(
-      type: PrinterType.bluetooth,
+    await _printerManager.connect(
+      type: bluetoothPrinter.typePrinter,
       model: BluetoothPrinterInput(
         name: bluetoothPrinter.deviceName,
         address: bluetoothPrinter.address!,
         isBle: bluetoothPrinter.isBle ?? false,
-        autoConnect: _reconnect,
+        autoConnect: true,
       ),
     );
-    pendingTask = null;
-    if (Platform.isAndroid) pendingTask = bytes;
-
-    if (bluetoothPrinter.typePrinter == PrinterType.bluetooth && Platform.isAndroid) {
-      if (_currentStatus == BTStatus.connected) {
-        printerManager.send(type: bluetoothPrinter.typePrinter, bytes: bytes);
-        pendingTask = null;
-      }
-    } else {
-      printerManager.send(type: bluetoothPrinter.typePrinter, bytes: bytes);
-    }
+    return _printerManager.send(type: bluetoothPrinter.typePrinter, bytes: bytes);
   }
 
-  static Future<void> printTicket({
+  static Future<(List<int> bytes, Generator)> _convertDataToPrinter({
     required final TicketReportRequest reportRequest,
     required final HardwareData? hardwareData,
     required final int totalPassengers,
@@ -112,6 +79,14 @@ class PosPrinterUtils {
     );
     bytes += generator.text(
       'Bus No.: ${hardwareData?.busNumber}',
+      styles: const PosStyles(
+        align: PosAlign.left,
+        bold: true,
+        height: PosTextSize.size1,
+      ),
+    );
+    bytes += generator.text(
+      'Bus No.: ${hardwareData?.routeName}',
       styles: const PosStyles(
         align: PosAlign.left,
         bold: true,
@@ -157,6 +132,44 @@ class PosPrinterUtils {
       ),
     );
 
-    _printEscPos(bytes, generator);
+    return (bytes, generator);
+  }
+
+  static void printTicket({
+    required final TicketReportRequest reportRequest,
+    required final HardwareData? hardwareData,
+    required final int totalPassengers,
+  }) async {
+    BluetoothPrinter? bluetoothPrinter;
+
+    _printerManager
+        .discovery(
+      type: PrinterType.bluetooth,
+      isBle: false,
+    )
+        .listen((device) async {
+      if (AppDefaults.printerName.map((name) => name.toLowerCase()).contains(device.name.toLowerCase())) {
+        bluetoothPrinter = BluetoothPrinter(
+          deviceName: device.name,
+          address: device.address,
+          isBle: false,
+          vendorId: device.vendorId,
+          productId: device.productId,
+          typePrinter: PrinterType.bluetooth,
+        );
+
+        final (List<int> bytes, Generator generator) = await _convertDataToPrinter(
+          reportRequest: reportRequest,
+          hardwareData: hardwareData,
+          totalPassengers: totalPassengers,
+        );
+
+        _printEscPos(
+          bytes,
+          generator,
+          bluetoothPrinter: bluetoothPrinter!,
+        );
+      }
+    });
   }
 }
