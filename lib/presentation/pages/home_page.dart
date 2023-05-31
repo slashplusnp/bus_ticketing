@@ -392,6 +392,7 @@ class _HomePageState extends State<HomePage> {
                 loading: () => const Center(child: CustomLoadingIndicator()),
                 error: (error, stackTrace) => Center(child: CustomErrorBuilder(error: error.toString())),
                 data: (ticketCategories) {
+                  if (ticketCategories.isEmpty) return Container();
                   final ticketCategory = ticketCategories.elementAt(selectedTicketCategoryIndexWatch);
                   final priceList = ticketCategory.priceList.orEmpty();
 
