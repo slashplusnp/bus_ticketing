@@ -1,12 +1,18 @@
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'ticket_report_request.g.dart';
 
+@HiveType(typeId: 2)
 @JsonSerializable()
 class ReportTicketCategory {
+  @HiveField(0)
   final int id;
+  @HiveField(1)
   final String name;
+  @HiveField(2)
   final int count;
+  @HiveField(3)
   final int total;
   ReportTicketCategory({
     required this.id,
@@ -33,12 +39,18 @@ class ReportTicketCategory {
   }
 }
 
+@HiveType(typeId: 3)
 @JsonSerializable()
 class TicketReportRequest {
+  @HiveField(0)
   final String? date;
+  @HiveField(1)
   final String? uuid;
+  @HiveField(2)
   final int? deviceId;
+  @HiveField(3)
   final int? total;
+  @HiveField(4)
   final List<ReportTicketCategory>? category;
   TicketReportRequest({
     this.date,

@@ -22,3 +22,4 @@ final selectedTicketCategoryIndexProvider = StateProvider<int>((ref) => 0);
 final selectedTicketPriceListProvider = StateNotifierProvider<SelectedTicketPriceListNotifier, List<TicketPriceModel>>((ref) {
   return SelectedTicketPriceListNotifier();
 });
+

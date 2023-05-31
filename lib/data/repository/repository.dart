@@ -85,14 +85,26 @@ class RepositoryImpl implements Repository {
 
   @override
   Future<Either<AppError, List<String>>> postTicketReport(List<TicketReportRequest> ticketReports) async {
-    // final ticketCategoryBox = Hive.box<TicketCategory>(HiveBoxManager.ticketCategoryBox);
-    // if (!(await _networkInfo.isConnected)) return Right(ticketCategoryBox.values.toList());
+    final ticketReportRequestBox = Hive.box<TicketReportRequest>(HiveBoxManager.ticketReportRequestBox);
+
+    if (!(await _networkInfo.isConnected)) {
+      ticketReportRequestBox.addAll(ticketReports);
+      return const Right([]);
+    }
 
     try {
       final response = await _remoteDataSource.postTicketReport(ticketReports);
+      final data = response.data.orEmpty();
 
-      return Right(response.data.orEmpty());
+      if (response.error == CustomErrorCode.hasError.code) {
+        ticketReportRequestBox.addAll(ticketReports);
+      } else {
+        ticketReportRequestBox.clear();
+      }
+
+      return Right(data);
     } catch (error) {
+      ticketReportRequestBox.addAll(ticketReports);
       return Left(AppError.fromError(error));
     }
   }

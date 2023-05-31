@@ -1,7 +1,9 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../resources/hive_box_manager.dart';
+import '../requests/ticket_report/ticket_report_request.dart';
 import '../responses/hardware_data/hardware_data_response.dart';
 import '../responses/ticket_category/ticket_category_response.dart';
 
@@ -15,12 +17,17 @@ class HiveUtils {
   static void registerAdapters() {
     Hive.registerAdapter(HardwareDataAdapter()); // 0
     Hive.registerAdapter(TicketCategoryAdapter()); // 1
+    Hive.registerAdapter(ReportTicketCategoryAdapter()); // 2
+    Hive.registerAdapter(TicketReportRequestAdapter()); // 3
   }
 
   static Future<void> openBoxes() async {
     await Hive.openBox<dynamic>(HiveBoxManager.settingsBox);
+    await Hive.openBox<int>(HiveBoxManager.todayTotalBox);
     await Hive.openBox<HardwareData>(HiveBoxManager.hardwareDataBox);
     await Hive.openBox<TicketCategory>(HiveBoxManager.ticketCategoryBox);
+    await Hive.openBox<ReportTicketCategory>(HiveBoxManager.reportTicketCategoryBox);
+    await Hive.openBox<TicketReportRequest>(HiveBoxManager.ticketReportRequestBox);
   }
 
   static void storeToBox<T>({
@@ -75,5 +82,9 @@ class HiveUtils {
       box.clear();
       box.addAll(data);
     }
+  }
+
+  static ValueListenable<Box<T>> getBoxListenable<T>({required String boxName}) {
+    return Hive.box<T>(boxName).listenable();
   }
 }

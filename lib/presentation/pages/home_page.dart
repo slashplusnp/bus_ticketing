@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/constants.dart';
@@ -16,6 +18,7 @@ import '../../extensions/extensions.dart';
 import '../../network/api_future_providers.dart';
 import '../../network/api_service.dart';
 import '../../providers/state_providers.dart';
+import '../../resources/color_manager.dart';
 import '../../resources/hive_box_manager.dart';
 import '../../resources/string_manager.dart';
 import '../../resources/values_manager.dart';
@@ -32,54 +35,74 @@ import '../widgets/widget_utils/widget_utils.dart';
 
 final homeScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      key: homeScaffoldMessengerKey,
-      appBar: AppBar(
-        title: const Text(Constants.appTitle),
-      ),
-      body: SlashPlusBottomBar(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppDefaults.contentPaddingSmall),
-          width: double.infinity,
-          child: Consumer(
-            builder: (context, ref, child) {
-              final ticketCategoriesFutureWatch = ref.watch(ticketCategoriesFutureProvider);
+  State<HomePage> createState() => _HomePageState();
+}
 
-              final selectedTicketPriceListNotifier = ref.watch(selectedTicketPriceListProvider.notifier);
+class _HomePageState extends State<HomePage> {
+  final _apiService = getInstance<ApiService>();
+  bool _internetConnected = false;
 
-              final selectedTicketCategoryIndexWatch = ref.watch(selectedTicketCategoryIndexProvider);
-              final selectedTicketCategoryIndexNotifier = ref.watch(selectedTicketCategoryIndexProvider.notifier);
+  @override
+  void initState() {
+    super.initState();
 
-              return ticketCategoriesFutureWatch.when(
-                loading: () => const Center(child: CustomLoadingIndicator()),
-                error: (error, stackTrace) => Center(child: CustomErrorBuilder(error: error.toString())),
-                data: (ticketCategories) {
-                  final ticketCategory = ticketCategories.elementAt(selectedTicketCategoryIndexWatch);
-                  final priceList = ticketCategory.priceList.orEmpty();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _cleanUnsyncedReports();
+      _clearPreviousTotals();
+    });
 
-                  return Column(
-                    children: [
-                      _getCategories(ticketCategories, selectedTicketCategoryIndexNotifier, selectedTicketCategoryIndexWatch),
-                      const Divider(height: AppDefaults.paddingLarge),
-                      Expanded(
-                        flex: 2,
-                        child: _getCategoryPriceList(priceList, selectedTicketPriceListNotifier, ticketCategory),
-                      ),
-                      _getSelectedPrices(),
-                    ],
-                  );
-                },
-              );
-            },
-          ),
-        ),
-      ),
+    InternetConnectionChecker().onStatusChange.listen((internetConnectionStatus) {
+      if (internetConnectionStatus == InternetConnectionStatus.connected) {
+        final ticketReportRequestBox = Hive.box<TicketReportRequest>(HiveBoxManager.ticketReportRequestBox);
+        final ticketReportRequests = ticketReportRequestBox.values.toList();
+
+        if (ticketReportRequests.isNotEmpty) {
+          _apiService.postTicketReport(ticketReports: ticketReportRequests);
+        }
+      }
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _internetConnected = internetConnectionStatus == InternetConnectionStatus.connected;
+        });
+      });
+    });
+  }
+
+  void _cleanUnsyncedReports() {
+    final ticketReportRequestBox = Hive.box<TicketReportRequest>(HiveBoxManager.ticketReportRequestBox);
+    List<TicketReportRequest> unsyncedReports = [];
+    for (final report in ticketReportRequestBox.values) {
+      if (unsyncedReports.where((r) => r.uuid == report.uuid).isEmpty) {
+        unsyncedReports.add(report);
+      }
+    }
+    ticketReportRequestBox.clear().then(
+      (value) {
+        ticketReportRequestBox.addAll(unsyncedReports);
+      },
     );
+  }
+
+  void _clearPreviousTotals() {
+    final todayTotalBox = Hive.box<int>(HiveBoxManager.todayTotalBox);
+    final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final keys = List<String>.from(todayTotalBox.keys);
+    keys.removeWhere((key) => key == todayKey);
+
+    todayTotalBox.deleteAll(keys);
+  }
+
+  void _addToTodayTotal(int total) {
+    final todayTotalBox = Hive.box<int>(HiveBoxManager.todayTotalBox);
+    final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final lastTotal = todayTotalBox.get(todayKey).orZero();
+    final newTotal = lastTotal + total;
+    todayTotalBox.put(todayKey, newTotal);
   }
 
   Consumer _getSelectedPrices() {
@@ -208,6 +231,8 @@ class HomePage extends StatelessWidget {
                         return ref.invalidate(selectedTicketPriceListProvider);
                       });
 
+                      _addToTodayTotal(reportRequest.total.orZero());
+
                       // context.navigator
                       //     .push<bool>(
                       //   MaterialPageRoute<bool>(
@@ -289,6 +314,95 @@ class HomePage extends StatelessWidget {
           );
         },
       ).toList(),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: homeScaffoldMessengerKey,
+      appBar: AppBar(
+        title: Column(
+          children: [
+            const Text(Constants.appTitle),
+            ValueListenableBuilder(
+              valueListenable: HiveUtils.getBoxListenable<int>(boxName: HiveBoxManager.todayTotalBox),
+              builder: (context, todayTotal, child) {
+                final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+                final todaysTotal = (todayTotal.get(todayKey)).orZero();
+
+                return Text(
+                  'Today\'s Total: Rs. $todaysTotal',
+                  style: context.bodySmall,
+                );
+              },
+            ),
+          ],
+        ),
+        actions: [
+          _internetConnected
+              ? Icon(
+                  Icons.sync,
+                  color: ColorManager.statusActive,
+                )
+              : Icon(
+                  Icons.sync_disabled,
+                  color: ColorManager.statusInactive,
+                ),
+          if (!_internetConnected)
+            ValueListenableBuilder(
+              valueListenable: HiveUtils.getBoxListenable<TicketReportRequest>(boxName: HiveBoxManager.ticketReportRequestBox),
+              builder: (context, ticketReportRequestBox, child) {
+                final ticketReportRequests = ticketReportRequestBox.values;
+
+                return Padding(
+                  padding: const EdgeInsets.only(right: AppSize.s10),
+                  child: Text(
+                    ticketReportRequests.length.toString(),
+                    style: context.titleSmall,
+                  ),
+                );
+              },
+            ),
+        ],
+      ),
+      body: SlashPlusBottomBar(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: AppDefaults.contentPaddingSmall),
+          width: double.infinity,
+          child: Consumer(
+            builder: (context, ref, child) {
+              final ticketCategoriesFutureWatch = ref.watch(ticketCategoriesFutureProvider);
+
+              final selectedTicketPriceListNotifier = ref.watch(selectedTicketPriceListProvider.notifier);
+
+              final selectedTicketCategoryIndexWatch = ref.watch(selectedTicketCategoryIndexProvider);
+              final selectedTicketCategoryIndexNotifier = ref.watch(selectedTicketCategoryIndexProvider.notifier);
+
+              return ticketCategoriesFutureWatch.when(
+                loading: () => const Center(child: CustomLoadingIndicator()),
+                error: (error, stackTrace) => Center(child: CustomErrorBuilder(error: error.toString())),
+                data: (ticketCategories) {
+                  final ticketCategory = ticketCategories.elementAt(selectedTicketCategoryIndexWatch);
+                  final priceList = ticketCategory.priceList.orEmpty();
+
+                  return Column(
+                    children: [
+                      _getCategories(ticketCategories, selectedTicketCategoryIndexNotifier, selectedTicketCategoryIndexWatch),
+                      const Divider(height: AppDefaults.paddingLarge),
+                      Expanded(
+                        flex: 2,
+                        child: _getCategoryPriceList(priceList, selectedTicketPriceListNotifier, ticketCategory),
+                      ),
+                      _getSelectedPrices(),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ),
     );
   }
 }
