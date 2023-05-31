@@ -24,7 +24,10 @@ class CustomSelectionContainer<T> extends StatelessWidget {
       onTap: () => onTap.call(value),
       borderRadius: const BorderRadius.all(Radius.circular(AppDefaults.contentBorderRadius)),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: AppDefaults.contentPadding, vertical: AppDefaults.contentPaddingSmall),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDefaults.padding,
+          vertical: AppDefaults.contentPadding,
+        ),
         decoration: BoxDecoration(
           color: isSelected ? context.primary : null,
           border: Border.all(color: context.primary),

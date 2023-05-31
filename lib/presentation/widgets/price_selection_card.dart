@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import '../../app/constants.dart';
 import '../../extensions/build_context_extensions.dart';
 import '../../resources/color_manager.dart';
+import '../../resources/values_manager.dart';
 
 enum PriceSelectionCardSize {
-  small(AppDefaults.contentPadding),
-  large(AppDefaults.paddingXXLarge);
+  small(AppSize.s30),
+  large(AppSize.s40);
 
   final double value;
   const PriceSelectionCardSize(this.value);
@@ -34,16 +35,19 @@ class PriceSelectionCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: const BorderRadius.all(Radius.circular(AppDefaults.contentBorderRadius)),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: size.value, vertical: size.value / 2),
+        height: size.value,
+        width: size.value * 1.6,
         decoration: BoxDecoration(
           border: Border.all(
             color: action == PriceSelectionAction.add ? context.primary : ColorManager.remove,
           ),
           borderRadius: const BorderRadius.all(Radius.circular(AppDefaults.contentBorderRadius)),
         ),
-        child: Text(
-          price.toString(),
-          style: context.titleSmall,
+        child: Center(
+          child: Text(
+            price.toString(),
+            style: context.titleSmall,
+          ),
         ),
       ),
     );

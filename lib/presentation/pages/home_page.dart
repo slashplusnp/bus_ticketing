@@ -145,6 +145,7 @@ class _HomePageState extends State<HomePage> {
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: AppDefaults.contentPaddingXXSmall),
                               child: Wrap(
+                                alignment: WrapAlignment.end,
                                 spacing: AppDefaults.contentPaddingSmall,
                                 runSpacing: AppDefaults.contentPaddingSmall / 2,
                                 children: priceModelList
@@ -162,7 +163,14 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           WidgetUtils.horizontalSpace(AppSize.s2),
-                          Text('($groupTotalPrice)'),
+                          SizedBox(
+                            width: AppSize.s40,
+                            child: Text(
+                              '($groupTotalPrice)',
+                              softWrap: true,
+                              textAlign: TextAlign.end,
+                            ),
+                          ),
                         ],
                       );
                     }).toList(),
@@ -271,15 +279,16 @@ class _HomePageState extends State<HomePage> {
       width: double.infinity,
       child: Wrap(
         direction: Axis.horizontal,
-        alignment: WrapAlignment.spaceAround,
-        spacing: AppDefaults.contentPaddingSmall,
-        runSpacing: AppDefaults.contentPaddingSmall / 2,
+        alignment: WrapAlignment.center,
+        spacing: AppDefaults.padding,
+        runSpacing: AppDefaults.contentPaddingSmall,
         children: priceList.mapIndexed(
           (index, category) {
             final price = priceList.elementAt(index);
 
             return PriceSelectionCard(
               key: UniqueKey(),
+              size: PriceSelectionCardSize.large,
               onTap: () => selectedTicketPriceListNotifier.addPrice(
                 TicketPriceModel(
                   category: ticketCategory,
@@ -302,8 +311,8 @@ class _HomePageState extends State<HomePage> {
     return Wrap(
       direction: Axis.horizontal,
       alignment: WrapAlignment.spaceAround,
-      spacing: AppDefaults.contentPaddingXXSmall,
-      runSpacing: AppDefaults.contentPaddingXSmall,
+      spacing: AppDefaults.padding,
+      runSpacing: AppDefaults.contentPadding,
       children: ticketCategories.mapIndexed(
         (index, category) {
           return CustomSelectionContainer<TicketCategory>(
