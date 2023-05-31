@@ -86,7 +86,7 @@ class PosPrinterUtils {
       ),
     );
     bytes += generator.text(
-      'Bus No.: ${hardwareData?.routeName}',
+      '${hardwareData?.routeName}',
       styles: const PosStyles(
         align: PosAlign.left,
         bold: true,
