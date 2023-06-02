@@ -46,6 +46,7 @@ extension NonNullString on String? {
 
 extension NonNullInt on int? {
   int orZero() => this ?? Constants.orZero;
+  int orValue(int value) => this ?? value;
 }
 
 extension NonNullDouble on double? {

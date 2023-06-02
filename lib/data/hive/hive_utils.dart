@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../../extensions/extensions.dart';
 import '../../resources/hive_box_manager.dart';
 import '../requests/ticket_report/ticket_report_request.dart';
 import '../responses/hardware_data/hardware_data_response.dart';
@@ -29,6 +30,12 @@ class HiveUtils {
     await Hive.openBox<TicketCategory>(HiveBoxManager.ticketCategoryBox);
     await Hive.openBox<ReportTicketCategory>(HiveBoxManager.reportTicketCategoryBox);
     await Hive.openBox<TicketReportRequest>(HiveBoxManager.ticketReportRequestBox);
+  }
+
+  static int getTodayTripCount() {
+    final tripCountBox = Hive.box<int>(HiveBoxManager.tripCountBox);
+    final todayKey = DateTime.now().toyMd();
+    return tripCountBox.get(todayKey).orValue(1);
   }
 
   static void storeToBox<T>({

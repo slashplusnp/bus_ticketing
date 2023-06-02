@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:geofence_service/geofence_service.dart';
@@ -6,6 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../app/constants.dart';
+import '../data/hive/hive_utils.dart';
 import '../extensions/extensions.dart';
 import '../resources/hive_box_manager.dart';
 
@@ -56,10 +58,14 @@ class GeofenceUtils {
     GeofenceStatus geofenceStatus,
     Location location,
   ) async {
-    final tripCountBox = Hive.box<int>(HiveBoxManager.tripCountBox);
-    final todayKey = DateTime.now().toyMd();
-    final todayTripCount = tripCountBox.get(todayKey).orZero();
-    tripCountBox.put(todayKey, todayTripCount + 1);
+    if (geofence.status == GeofenceStatus.EXIT) {
+      final tripCountBox = Hive.box<int>(HiveBoxManager.tripCountBox);
+      final todayKey = DateTime.now().toyMd();
+      final todayTripCount = HiveUtils.getTodayTripCount();
+      tripCountBox.put(todayKey, todayTripCount + 1);
+    }
+
+    log(geofence.status.toString());
 
     _geofenceStreamController.sink.add(geofence);
   }

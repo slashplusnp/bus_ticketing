@@ -55,8 +55,9 @@ class _HomePageState extends State<HomePage> {
       final hardwareData = HiveUtils.getFromObjectBox<HardwareData>(boxName: HiveBoxManager.hardwareDataBox);
       if (hardwareData != null) {
         final points = hardwareData.points.toLatLngList();
-
-        GeofenceUtils.initGeofenceService({'pointA': points.first, 'pointB': points.last});
+        if (points.isNotEmpty) {
+          GeofenceUtils.initGeofenceService({'pointA': points.first, 'pointB': points.last});
+        }
       }
     });
 
@@ -232,9 +233,7 @@ class _HomePageState extends State<HomePage> {
                         },
                       ).toList();
 
-                      final tripCountBox = Hive.box<int>(HiveBoxManager.tripCountBox);
-                      final todayKey = DateTime.now().toyMd();
-                      final todayTripCount = tripCountBox.get(todayKey).orZero();
+                      final todayTripCount = HiveUtils.getTodayTripCount();
 
                       final TicketReportRequest reportRequest = TicketReportRequest(
                         date: DateTime.now().toyMdHmS(),
@@ -333,20 +332,24 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final hardwareData = HiveUtils.getFromObjectBox<HardwareData>(boxName: HiveBoxManager.hardwareDataBox);
+
     return Scaffold(
       key: homeScaffoldMessengerKey,
       appBar: AppBar(
         title: Column(
           children: [
-            const Text(Constants.appTitle),
+            Text('${Constants.appTitle} (${(hardwareData?.busNumber).orEmptyDashed()})'),
             ValueListenableBuilder(
               valueListenable: HiveUtils.getBoxListenable<int>(boxName: HiveBoxManager.todayTotalBox),
               builder: (context, todayTotal, child) {
+                final tripCount = HiveUtils.getTodayTripCount();
+
                 final todayKey = DateTime.now().toyMd();
                 final todaysTotal = (todayTotal.get(todayKey)).orZero();
 
                 return Text(
-                  'Today\'s Total: Rs. $todaysTotal',
+                  'Today\'s Total: Rs. $todaysTotal (Trip $tripCount)',
                   style: context.bodySmall,
                 );
               },
@@ -405,10 +408,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       _getCategories(ticketCategories, selectedTicketCategoryIndexNotifier, selectedTicketCategoryIndexWatch),
                       const Divider(height: AppDefaults.paddingLarge),
-                      Expanded(
-                        flex: 2,
-                        child: _getCategoryPriceList(priceList, selectedTicketPriceListNotifier, ticketCategory),
-                      ),
+                      Expanded(child: _getCategoryPriceList(priceList, selectedTicketPriceListNotifier, ticketCategory)),
                       _getSelectedPrices(),
                     ],
                   );

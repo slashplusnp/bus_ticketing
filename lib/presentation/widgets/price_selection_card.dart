@@ -7,7 +7,7 @@ import '../../resources/values_manager.dart';
 
 enum PriceSelectionCardSize {
   small(AppSize.s30),
-  large(AppSize.s40);
+  large(AppSize.s50);
 
   final double value;
   const PriceSelectionCardSize(this.value);
