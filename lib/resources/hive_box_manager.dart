@@ -1,6 +1,7 @@
 class HiveBoxManager {
   static const settingsBox = 'settingsBox';
   static const todayTotalBox = 'todayTotalBox';
+  static const tripCountBox = 'tripCountBox';
   static const hardwareDataBox = 'hardwareDataBox';
   static const ticketCategoryBox = 'ticketCategoryBox';
   static const reportTicketCategoryBox = 'reportTicketCategoryBox';

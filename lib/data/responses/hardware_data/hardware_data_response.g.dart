@@ -25,13 +25,14 @@ class HardwareDataAdapter extends TypeAdapter<HardwareData> {
       busNumber: fields[5] as String?,
       routeName: fields[6] as String?,
       isCircular: fields[7] as int?,
+      points: fields[8] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, HardwareData obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -47,7 +48,9 @@ class HardwareDataAdapter extends TypeAdapter<HardwareData> {
       ..writeByte(6)
       ..write(obj.routeName)
       ..writeByte(7)
-      ..write(obj.isCircular);
+      ..write(obj.isCircular)
+      ..writeByte(8)
+      ..write(obj.points);
   }
 
   @override
@@ -74,6 +77,7 @@ HardwareData _$HardwareDataFromJson(Map<String, dynamic> json) => HardwareData(
       busNumber: json['bus_number'] as String?,
       routeName: json['route_name'] as String?,
       isCircular: json['is_circular'] as int?,
+      points: json['points'] as String?,
     );
 
 Map<String, dynamic> _$HardwareDataToJson(HardwareData instance) =>
@@ -86,6 +90,7 @@ Map<String, dynamic> _$HardwareDataToJson(HardwareData instance) =>
       'bus_number': instance.busNumber,
       'route_name': instance.routeName,
       'is_circular': instance.isCircular,
+      'points': instance.points,
     };
 
 HardwareDataResponse _$HardwareDataResponseFromJson(

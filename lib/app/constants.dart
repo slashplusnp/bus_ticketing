@@ -55,4 +55,6 @@ class AppDefaults {
   static const paddingLarge = 16.0;
   static const paddingXLarge = 18.0;
   static const paddingXXLarge = 24.0;
+
+  static const pointGeofenceRadiusInMeter = 100.0;
 }

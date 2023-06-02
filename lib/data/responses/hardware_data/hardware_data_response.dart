@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -24,6 +25,8 @@ class HardwareData {
   final String? routeName;
   @HiveField(7)
   final int? isCircular;
+  @HiveField(8)
+  final String? points;
 
   HardwareData({
     this.id,
@@ -34,6 +37,7 @@ class HardwareData {
     this.busNumber,
     this.routeName,
     this.isCircular,
+    this.points,
   });
 
   factory HardwareData.fromJson(Map<String, dynamic> json) => _$HardwareDataFromJson(json);
@@ -48,6 +52,7 @@ class HardwareData {
     String? busNumber,
     String? routeName,
     int? isCircular,
+    String? points,
   }) {
     return HardwareData(
       id: id ?? this.id,
@@ -58,6 +63,7 @@ class HardwareData {
       busNumber: busNumber ?? this.busNumber,
       routeName: routeName ?? this.routeName,
       isCircular: isCircular ?? this.isCircular,
+      points: points ?? this.points,
     );
   }
 }

@@ -24,6 +24,7 @@ class HiveUtils {
   static Future<void> openBoxes() async {
     await Hive.openBox<dynamic>(HiveBoxManager.settingsBox);
     await Hive.openBox<int>(HiveBoxManager.todayTotalBox);
+    await Hive.openBox<int>(HiveBoxManager.tripCountBox);
     await Hive.openBox<HardwareData>(HiveBoxManager.hardwareDataBox);
     await Hive.openBox<TicketCategory>(HiveBoxManager.ticketCategoryBox);
     await Hive.openBox<ReportTicketCategory>(HiveBoxManager.reportTicketCategoryBox);

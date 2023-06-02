@@ -22,6 +22,7 @@ import '../../resources/color_manager.dart';
 import '../../resources/hive_box_manager.dart';
 import '../../resources/string_manager.dart';
 import '../../resources/values_manager.dart';
+import '../../utils/geofence_utils.dart';
 import '../../utils/pos_pirnter_utils.dart';
 import '../../utils/utils.dart';
 import '../models/ticket_price_model.dart';
@@ -51,8 +52,18 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final hardwareData = HiveUtils.getFromObjectBox<HardwareData>(boxName: HiveBoxManager.hardwareDataBox);
+      if (hardwareData != null) {
+        final points = hardwareData.points.toLatLngList();
+
+        GeofenceUtils.initGeofenceService({'pointA': points.first, 'pointB': points.last});
+      }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _cleanUnsyncedReports();
       _clearPreviousTotals();
+      _clearPreviousTrips();
     });
 
     InternetConnectionChecker().onStatusChange.listen((internetConnectionStatus) {
@@ -95,6 +106,16 @@ class _HomePageState extends State<HomePage> {
     keys.removeWhere((key) => key == todayKey);
 
     todayTotalBox.deleteAll(keys);
+  }
+
+  void _clearPreviousTrips() {
+    final tripCountBox = Hive.box<int>(HiveBoxManager.tripCountBox);
+    final todayKey = DateTime.now().toyMd();
+
+    final keys = List<String>.from(tripCountBox.keys);
+    keys.removeWhere((key) => key == todayKey);
+
+    tripCountBox.deleteAll(keys);
   }
 
   void _addToTodayTotal(int total) {
@@ -211,16 +232,21 @@ class _HomePageState extends State<HomePage> {
                         },
                       ).toList();
 
+                      final tripCountBox = Hive.box<int>(HiveBoxManager.tripCountBox);
+                      final todayKey = DateTime.now().toyMd();
+                      final todayTripCount = tripCountBox.get(todayKey).orZero();
+
                       final TicketReportRequest reportRequest = TicketReportRequest(
-                        date: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+                        date: DateTime.now().toyMdHmS(),
                         deviceId: (hardwareData?.id).orZero(),
                         total: totalPrice,
+                        tripCount: todayTripCount,
                         uuid: '${Utils.generateUUID()}-${DateTime.now().millisecondsSinceEpoch}',
                         category: requestCategoryList,
                       );
 
                       final totalPassengers = reportRequest.category
-                          ?.map(
+                          .map(
                             (c) => c.count,
                           )
                           .fold(
@@ -240,27 +266,6 @@ class _HomePageState extends State<HomePage> {
                       });
 
                       _addToTodayTotal(reportRequest.total.orZero());
-
-                      // context.navigator
-                      //     .push<bool>(
-                      //   MaterialPageRoute<bool>(
-                      //     builder: (context) => PosPrinterPlatformWidget(
-                      //       reportRequest: reportRequest,
-                      //       hardwareData: hardwareData,
-                      //       totalPassengers: totalPassengers.orZero(),
-                      //     ),
-                      //   ),
-                      // )
-                      //     .then<void>(
-                      //   (hasPrinted) {
-                      //     if (hasPrinted.orFalse()) {
-                      //       final ApiService apiService = getInstance<ApiService>();
-                      //       apiService.postTicketReport(ticketReports: [reportRequest]).then(
-                      //         (value) => ref.invalidate(selectedTicketPriceListProvider),
-                      //       );
-                      //     }
-                      //   },
-                      // );
                     },
                   ),
                   WidgetUtils.verticalSpace(AppSize.s5),
@@ -337,7 +342,7 @@ class _HomePageState extends State<HomePage> {
             ValueListenableBuilder(
               valueListenable: HiveUtils.getBoxListenable<int>(boxName: HiveBoxManager.todayTotalBox),
               builder: (context, todayTotal, child) {
-                final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+                final todayKey = DateTime.now().toyMd();
                 final todaysTotal = (todayTotal.get(todayKey)).orZero();
 
                 return Text(

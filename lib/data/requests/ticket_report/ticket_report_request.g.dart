@@ -60,18 +60,19 @@ class TicketReportRequestAdapter extends TypeAdapter<TicketReportRequest> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return TicketReportRequest(
-      date: fields[0] as String?,
-      uuid: fields[1] as String?,
-      deviceId: fields[2] as int?,
-      total: fields[3] as int?,
-      category: (fields[4] as List?)?.cast<ReportTicketCategory>(),
+      date: fields[0] as String,
+      uuid: fields[1] as String,
+      deviceId: fields[2] as int,
+      total: fields[3] as int,
+      category: (fields[4] as List).cast<ReportTicketCategory>(),
+      tripCount: fields[5] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, TicketReportRequest obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.date)
       ..writeByte(1)
@@ -81,7 +82,9 @@ class TicketReportRequestAdapter extends TypeAdapter<TicketReportRequest> {
       ..writeByte(3)
       ..write(obj.total)
       ..writeByte(4)
-      ..write(obj.category);
+      ..write(obj.category)
+      ..writeByte(5)
+      ..write(obj.tripCount);
   }
 
   @override
@@ -119,13 +122,14 @@ Map<String, dynamic> _$ReportTicketCategoryToJson(
 
 TicketReportRequest _$TicketReportRequestFromJson(Map<String, dynamic> json) =>
     TicketReportRequest(
-      date: json['date'] as String?,
-      uuid: json['uuid'] as String?,
-      deviceId: json['device_id'] as int?,
-      total: json['total'] as int?,
-      category: (json['category'] as List<dynamic>?)
-          ?.map((e) => ReportTicketCategory.fromJson(e as Map<String, dynamic>))
+      date: json['date'] as String,
+      uuid: json['uuid'] as String,
+      deviceId: json['device_id'] as int,
+      total: json['total'] as int,
+      category: (json['category'] as List<dynamic>)
+          .map((e) => ReportTicketCategory.fromJson(e as Map<String, dynamic>))
           .toList(),
+      tripCount: json['trip_count'] as int,
     );
 
 Map<String, dynamic> _$TicketReportRequestToJson(
@@ -135,5 +139,6 @@ Map<String, dynamic> _$TicketReportRequestToJson(
       'uuid': instance.uuid,
       'device_id': instance.deviceId,
       'total': instance.total,
-      'category': instance.category?.map((e) => e.toJson()).toList(),
+      'category': instance.category.map((e) => e.toJson()).toList(),
+      'trip_count': instance.tripCount,
     };

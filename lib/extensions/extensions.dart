@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart' show Color;
+import 'package:intl/intl.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../app/constants.dart';
 
@@ -27,6 +29,19 @@ extension NonNullString on String? {
   int toIntOrValue(int value) => int.parse(this ?? '$value');
   double toDoubleOrZero() => double.parse(this ?? '0');
   double toDoubleOrValue(double value) => double.tryParse(orEmpty()) ?? value;
+
+  List<LatLng> toLatLngList() {
+    return (this?.split(',').map(
+      (latLngString) {
+        final List<String> latLngStringList = latLngString.split(' ');
+        return LatLng(
+          latLngStringList.first.trim().toDoubleOrZero(),
+          latLngStringList.last.trim().toDoubleOrZero(),
+        );
+      },
+    ).toList())
+        .orEmpty();
+  }
 }
 
 extension NonNullInt on int? {
@@ -53,3 +68,7 @@ extension FormatDatetime on DateTime? {
   DateTime? addYear(int year) => this == null ? null : DateTime(this!.year + year, this!.month, this!.day);
 }
 
+extension DateTimeExtension on DateTime {
+  String toyMdHmS() => DateFormat('yyyy-MM-dd HH:mm:ss').format(this);
+  String toyMd() => DateFormat('yyyy-MM-dd').format(this);
+}
