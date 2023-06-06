@@ -54,14 +54,14 @@ class TicketReportRequest {
   @HiveField(4)
   final List<ReportTicketCategory> category;
   @HiveField(5)
-  final int tripCount;
+  final int trip;
   TicketReportRequest({
     required this.date,
     required this.uuid,
     required this.deviceId,
     required this.total,
     required this.category,
-    required this.tripCount,
+    required this.trip,
   });
 
   factory TicketReportRequest.fromJson(Map<String, dynamic> json) => _$TicketReportRequestFromJson(json);
@@ -82,7 +82,7 @@ class TicketReportRequest {
       deviceId: deviceId ?? this.deviceId,
       total: total ?? this.total,
       category: category ?? this.category,
-      tripCount: tripCount ?? this.tripCount,
+      trip: tripCount ?? this.trip,
     );
   }
 }

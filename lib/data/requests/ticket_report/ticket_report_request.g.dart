@@ -65,7 +65,7 @@ class TicketReportRequestAdapter extends TypeAdapter<TicketReportRequest> {
       deviceId: fields[2] as int,
       total: fields[3] as int,
       category: (fields[4] as List).cast<ReportTicketCategory>(),
-      tripCount: fields[5] as int,
+      trip: fields[5] as int,
     );
   }
 
@@ -84,7 +84,7 @@ class TicketReportRequestAdapter extends TypeAdapter<TicketReportRequest> {
       ..writeByte(4)
       ..write(obj.category)
       ..writeByte(5)
-      ..write(obj.tripCount);
+      ..write(obj.trip);
   }
 
   @override
@@ -129,7 +129,7 @@ TicketReportRequest _$TicketReportRequestFromJson(Map<String, dynamic> json) =>
       category: (json['category'] as List<dynamic>)
           .map((e) => ReportTicketCategory.fromJson(e as Map<String, dynamic>))
           .toList(),
-      tripCount: json['trip_count'] as int,
+      trip: json['trip'] as int,
     );
 
 Map<String, dynamic> _$TicketReportRequestToJson(
@@ -140,5 +140,5 @@ Map<String, dynamic> _$TicketReportRequestToJson(
       'device_id': instance.deviceId,
       'total': instance.total,
       'category': instance.category.map((e) => e.toJson()).toList(),
-      'trip_count': instance.tripCount,
+      'trip': instance.trip,
     };

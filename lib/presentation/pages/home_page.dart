@@ -239,7 +239,7 @@ class _HomePageState extends State<HomePage> {
                         date: DateTime.now().toyMdHmS(),
                         deviceId: (hardwareData?.id).orZero(),
                         total: totalPrice,
-                        tripCount: todayTripCount,
+                        trip: todayTripCount,
                         uuid: '${Utils.generateUUID()}-${DateTime.now().millisecondsSinceEpoch}',
                         category: requestCategoryList,
                       );
