@@ -211,11 +211,11 @@ class _HomePageState extends State<HomePage> {
                   const Divider(height: AppDefaults.paddingLarge),
                   SaveResetCancelButtons(
                     saveTitle: AppString.print,
-                    onSave: () {
+                    onSave:  () {
                       final hardwareData = HiveUtils.getFromObjectBox<HardwareData>(boxName: HiveBoxManager.hardwareDataBox);
-
+                  
                       log((hardwareData?.toJson()).toString());
-
+                  
                       final categoryGroupedTicketPrices = selectedTicketPriceListWatch.groupListsBy((ticket) => ticket.category);
                       final List<ReportTicketCategory> requestCategoryList = categoryGroupedTicketPrices.keys.map<ReportTicketCategory>(
                         (key) {
@@ -223,7 +223,7 @@ class _HomePageState extends State<HomePage> {
                           final name = key.name.orEmpty();
                           final count = tickets.length;
                           final total = tickets.map((ticket) => ticket.price).fold(0, (a, b) => a + b);
-
+                  
                           return ReportTicketCategory(
                             id: key.id,
                             name: name,
@@ -232,9 +232,9 @@ class _HomePageState extends State<HomePage> {
                           );
                         },
                       ).toList();
-
+                  
                       final todayTripCount = HiveUtils.getTodayTripCount();
-
+                  
                       final TicketReportRequest reportRequest = TicketReportRequest(
                         date: DateTime.now().toyMdHmS(),
                         deviceId: (hardwareData?.id).orZero(),
@@ -243,7 +243,7 @@ class _HomePageState extends State<HomePage> {
                         uuid: '${Utils.generateUUID()}-${DateTime.now().millisecondsSinceEpoch}',
                         category: requestCategoryList,
                       );
-
+                  
                       final totalPassengers = reportRequest.category
                           .map(
                             (c) => c.count,
@@ -252,9 +252,9 @@ class _HomePageState extends State<HomePage> {
                             0,
                             (a, b) => a + b,
                           );
-
+                  
                       final ApiService apiService = getInstance<ApiService>();
-
+                  
                       PosPrinterUtils.printTicket(
                         reportRequest: reportRequest,
                         hardwareData: hardwareData,
@@ -262,8 +262,10 @@ class _HomePageState extends State<HomePage> {
                       );
                       apiService.postTicketReport(ticketReports: [reportRequest]).then((_) {
                         return ref.invalidate(selectedTicketPriceListProvider);
-                      });
-
+                      }).then((value) {
+                        return null;
+                      },);
+                  
                       _addToTodayTotal(reportRequest.total.orZero());
                     },
                   ),
