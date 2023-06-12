@@ -72,6 +72,12 @@ class ApiServiceImpl implements ApiService {
 
   @override
   Future<List<String>> postTicketReport({required List<TicketReportRequest> ticketReports}) async {
+    _appStateUtils.handleState(
+      AppEmitState(
+        isLoading: true,
+        loadingMessage: 'Saving Ticket',
+      ),
+    );
     return await _repository.postTicketReport(ticketReports).fold(
       (appError) {
         _appStateUtils.handleState(AppErrorState(appError: appError));
