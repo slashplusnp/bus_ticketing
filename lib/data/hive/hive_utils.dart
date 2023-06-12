@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -35,7 +37,9 @@ class HiveUtils {
   static int getTodayTripCount() {
     final tripCountBox = Hive.box<int>(HiveBoxManager.tripCountBox);
     final todayKey = DateTime.now().toyMd();
-    return tripCountBox.get(todayKey).orValue(1);
+    final todayCount = tripCountBox.get(todayKey);
+    log('initial: $todayCount');
+    return todayCount.orValue(1);
   }
 
   static void storeToBox<T>({
