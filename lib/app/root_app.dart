@@ -34,7 +34,7 @@ class RootApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           navigatorKey: navigatorKey,
           theme: ThemeManager.getAppTheme(),
-          initialRoute: Routes.splash.name,
+          initialRoute: Routes.splash.routeName,
           onGenerateRoute: Routes.getRoute,
           builder: (context, child) {
             return ScrollConfiguration(

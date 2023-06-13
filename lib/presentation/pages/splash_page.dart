@@ -26,7 +26,7 @@ class _SplashPageState extends State<SplashPage> {
         const Duration(seconds: AppDefaults.splashSec),
         () {
           final hasUserData = HiveUtils.getFromObjectBox<HardwareData>(boxName: HiveBoxManager.hardwareDataBox) != null;
-          final navigatorRoute = hasUserData ? Routes.home.name : Routes.login.name;
+          final navigatorRoute = hasUserData ? Routes.home.routeName : Routes.login.routeName;
 
           context.navigator.pushNamedAndRemoveUntil(
             navigatorRoute,

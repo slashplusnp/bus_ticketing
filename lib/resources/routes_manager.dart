@@ -11,11 +11,11 @@ enum Routes {
   home('/home'),
   ;
 
-  final String name;
-  const Routes(this.name);
+  final String routeName;
+  const Routes(this.routeName);
 
   static Routes fromName(String name) {
-    return Routes.values.firstWhere((route) => route.name == name);
+    return Routes.values.firstWhere((route) => route.routeName == name);
   }
 
   static Widget _getWidget(RouteSettings routeSettings) {

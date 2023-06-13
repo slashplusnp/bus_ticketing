@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:flutter/services.dart';
 
+import '../app/constants.dart';
 import '../extensions/extensions.dart';
 
 enum CustomErrorCode {
@@ -45,13 +46,17 @@ abstract class AppError {
     if (error is DioError) {
       final statusCode = error.response?.statusCode;
       final statusMessage = error.response?.statusMessage;
-      final errorMessage = error.response?.data['error_message'].toString();
+      final errorMessage = (error.response?.data['errorMessage']).toString();
+
+      if (errorMessage.toLowerCase() == Constants.serverDeviceNotFoundMessage.toLowerCase()) {
+        return const AppErrorDeviceNotFound();
+      }
 
       switch (error.type) {
         case DioErrorType.unknown:
           return const AppErrorUnknown();
         case DioErrorType.badResponse:
-          return AppErrorServerCustom(errorMessage: (error.response?.data['error_message']).toString());
+          return AppErrorServerCustom(errorMessage: errorMessage);
         default:
           log('AppError: ${error.toString()}');
 
@@ -97,6 +102,15 @@ class AppErrorUnknown extends AppError {
       : super(
           title: 'Unknown Error',
           description: 'Unknown Error',
+        );
+}
+
+@immutable
+class AppErrorDeviceNotFound extends AppError {
+  const AppErrorDeviceNotFound()
+      : super(
+          title: 'Device Not Found!',
+          description: 'Please re-assign and login again.',
         );
 }
 

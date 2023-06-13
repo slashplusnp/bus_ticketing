@@ -95,7 +95,7 @@ class _LoginFormWidget extends StatelessWidget {
 
                                   await DependencyInjection.reset().then((_) {
                                     context.navigator.pushNamedAndRemoveUntil(
-                                      Routes.home.name,
+                                      Routes.home.routeName,
                                       (route) => false,
                                     );
                                   });

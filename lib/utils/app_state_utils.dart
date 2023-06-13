@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import '../app/root_app.dart';
 import '../data/hive/hive_utils.dart';
 import '../data/responses/hardware_data/hardware_data_response.dart';
+import '../extensions/build_context_extensions.dart';
 import '../network/error_handler.dart';
 import '../presentation/pages/home_page.dart';
+import '../presentation/widgets/dialogs/custom_dialog.dart';
+import '../presentation/widgets/dialogs/loading_widget.dart';
 import '../providers/app_state/app_state.dart';
 import '../resources/hive_box_manager.dart';
 import '../resources/routes_manager.dart';
-import '../presentation/widgets/dialogs/custom_dialog.dart';
-import '../presentation/widgets/dialogs/loading_widget.dart';
 
 class AppStateUtils {
   void handleState(AppState appState) {
@@ -34,6 +35,18 @@ class AppStateUtils {
     final appError = appState.appError;
     if (appError == null) return;
     switch (appError.runtimeType) {
+      case AppErrorDeviceNotFound:
+        CustomDialog.instance()
+            .showAppError(
+          context: context,
+          appError: const AppErrorDeviceNotFound(),
+        )
+            .then(
+          (isOkay) {
+            HiveUtils.clearBox<HardwareData>(boxName: HiveBoxManager.hardwareDataBox);
+            context.navigator.pushNamedAndRemoveUntil(Routes.login.routeName, (route) => false);
+          },
+        );
       case AppErrorServerDown:
         CustomDialog.instance().showServerMaintenanceBreakError(
           context: context,
@@ -59,7 +72,7 @@ class AppStateUtils {
           (okay) {
             if (okay) {
               HiveUtils.clearBox<HardwareData>(boxName: HiveBoxManager.hardwareDataBox);
-              Navigator.of(context).pushNamedAndRemoveUntil(Routes.login.name, (route) => false);
+              Navigator.of(context).pushNamedAndRemoveUntil(Routes.login.routeName, (route) => false);
             }
           },
         );

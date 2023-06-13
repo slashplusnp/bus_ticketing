@@ -27,6 +27,8 @@ class Constants {
   static const emptyDashedString = '---';
   static const orZero = 0;
   static const orZeroDouble = 0.0;
+
+  static const serverDeviceNotFoundMessage = 'Device Not Found';
 }
 
 class AppDefaults {
