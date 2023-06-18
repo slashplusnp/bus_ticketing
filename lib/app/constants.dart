@@ -1,3 +1,4 @@
+
 class HeroTagConstants {
   static const onboardingBlobA = 'onboarding-blob-a';
   static const onboardingBlobB = 'onboarding-blob-b';
@@ -59,4 +60,6 @@ class AppDefaults {
   static const paddingXXLarge = 24.0;
 
   static const pointGeofenceRadiusInMeter = 100.0;
+
+  static const timeZoneOffset = Duration(hours: 5, minutes: 45);
 }

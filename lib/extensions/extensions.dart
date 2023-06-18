@@ -72,4 +72,5 @@ extension FormatDatetime on DateTime? {
 extension DateTimeExtension on DateTime {
   String toyMdHmS() => DateFormat('yyyy-MM-dd HH:mm:ss').format(this);
   String toyMd() => DateFormat('yyyy-MM-dd').format(this);
+  DateTime toLocalTimeZone() => subtract(timeZoneOffset - AppDefaults.timeZoneOffset);
 }
