@@ -87,9 +87,10 @@ class _HomePageState extends State<HomePage> {
 
   void _cleanUnsyncedReports() {
     final ticketReportRequestBox = Hive.box<TicketReportRequest>(HiveBoxManager.ticketReportRequestBox);
+    final now = DateTime.now();
     List<TicketReportRequest> unsyncedReports = [];
     for (final report in ticketReportRequestBox.values) {
-      if (unsyncedReports.where((r) => r.uuid == report.uuid).isEmpty) {
+      if (unsyncedReports.where((r) => r.uuid == report.uuid && (r.date.toDateTime()?.isBefore(now)).orFalse()).isEmpty) {
         unsyncedReports.add(report);
       }
     }
